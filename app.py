@@ -149,32 +149,41 @@ st.markdown("""
         --border: #e2e8f0;
     }
 
-    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    @keyframes float { 0%, 100% { transform: translateY(-5px); } 50% { transform: translateY(5px); } }
-    @keyframes pulseSoft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-    @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    /* Page Load Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Smooth Transitions */
+    :root {
+        --transition-speed: 0.3s ease-in-out;
+    }
 
     body, [data-testid="stAppViewContainer"] {
         background-color: var(--light-bg) !important;
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+        animation: fadeIn 0.5s ease-in-out;
     }
 
     [data-testid="stHeader"] { background: transparent !important; }
 
+    /* ─── HERO HEADER: Wide rectangular div with deep blue gradient background ─── */
     .hero-header {
-        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 35%, var(--accent) 100%);
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
         background-size: 400% 400%;
         padding: 3.5rem 2.5rem;
         border-radius: 24px;
         margin-bottom: 2.5rem;
         box-shadow: 0 20px 60px rgba(30, 58, 138, 0.2);
-        animation: fadeInDown 0.8s ease-out, gradientShift 8s ease infinite;
         position: relative;
         overflow: hidden;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.5s ease-in-out;
     }
 
     .hero-header::before {
@@ -188,16 +197,6 @@ st.markdown("""
         animation: float 6s ease-in-out infinite;
     }
 
-    .hero-header::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    }
-
     .app-title {
         font-size: 2.8rem;
         font-weight: 900;
@@ -205,7 +204,10 @@ st.markdown("""
         margin: 0 0 0.5rem 0;
         text-shadow: 0 2px 15px rgba(0,0,0,0.15);
         letter-spacing: -0.02em;
-        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
     }
 
     .app-subtitle {
@@ -214,9 +216,9 @@ st.markdown("""
         margin: 0;
         font-weight: 500;
         letter-spacing: 0.01em;
-        position: relative;
     }
 
+    /* ─── MODERN CARD: White background with light gray border ─── */
     .modern-card {
         background: var(--card-bg);
         border-radius: 20px;
@@ -224,28 +226,11 @@ st.markdown("""
         margin-bottom: 1.8rem;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
         border: 1px solid var(--border);
-        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all var(--transition-speed);
         position: relative;
         overflow: hidden;
-        animation: fadeInUp 0.6s ease-out;
+        animation: fadeIn 0.5s ease-in-out;
     }
-
-    .modern-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .modern-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
-    }
-    .modern-card:hover::before { transform: scaleX(1); }
 
     .card-title {
         font-size: 1.35rem;
@@ -263,6 +248,98 @@ st.markdown("""
         margin-bottom: 1.2rem;
     }
 
+    /* ─── TEXTAREA: Document icon label with focus-within effect ─── */
+    .textarea-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .textarea-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .stTextArea textarea {
+        border-radius: 12px !important;
+        border: 1.5px solid var(--border) !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        padding: 1rem !important;
+        transition: all var(--transition-speed) !important;
+        background: #f8fafc !important;
+        color: var(--text-dark) !important;
+    }
+    
+    .stTextArea:focus-within textarea {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25) !important;
+    }
+
+    /* ─── FILE UPLOADER: Dashed border with hover effects ─── */
+    .file-uploader-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    [data-testid="stFileUploader"] > div {
+        border-radius: 16px !important;
+        border: 2px dashed rgba(59, 130, 246, 0.3) !important;
+        padding: 1.5rem !important;
+        transition: all var(--transition-speed) !important;
+        background: rgba(248, 250, 252, 0.8) !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    
+    [data-testid="stFileUploader"] > div:hover {
+        border-color: var(--primary) !important;
+        background: rgba(59, 130, 246, 0.05) !important;
+        transform: scale(1.02);
+    }
+    
+    .upload-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        transition: transform 0.2s ease;
+    }
+    
+    [data-testid="stFileUploader"] > div:hover .upload-icon {
+        transform: scale(1.05);
+    }
+
+    /* ─── ANALYZE BUTTON: Orange background with rocket icon ─── */
+    .analyze-btn-wrapper .stButton > button {
+        background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%) !important;
+        color: white !important;
+        font-weight: 800 !important;
+        font-size: 1.1rem !important;
+        padding: 0.9rem 3rem !important;
+        border-radius: 14px !important;
+        border: none !important;
+        box-shadow: 0 8px 30px rgba(249, 115, 22, 0.3) !important;
+        transition: all 0.2s ease-in-out !important;
+        letter-spacing: 0.02em !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+    
+    .analyze-btn-wrapper .stButton > button:hover {
+        background: linear-gradient(135deg, #ea580c 0%, #d97706 100%) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 12px 40px rgba(249, 115, 22, 0.4) !important;
+    }
+
+    /* ─── SECTION HEADERS ─── */
     .section-header {
         font-size: 1.7rem;
         font-weight: 800;
@@ -273,7 +350,7 @@ st.markdown("""
         display: flex;
         align-items: center;
         gap: 0.6rem;
-        animation: fadeInUp 0.5s ease-out;
+        animation: fadeIn 0.5s ease-in-out;
     }
 
     .sub-header {
@@ -286,7 +363,7 @@ st.markdown("""
         gap: 0.5rem;
     }
 
-    /* ─── Metrics ─── */
+    /* ─── METRICS ─── */
     .metric-card {
         background: var(--card-bg);
         border-radius: 16px;
@@ -294,8 +371,8 @@ st.markdown("""
         text-align: center;
         border: 1px solid var(--border);
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-        transition: all 0.3s ease;
-        animation: fadeInUp 0.5s ease-out;
+        transition: all var(--transition-speed);
+        animation: fadeIn 0.5s ease-in-out;
     }
     .metric-card:hover {
         transform: translateY(-4px);
@@ -321,7 +398,7 @@ st.markdown("""
         margin-top: 0.3rem;
     }
 
-    /* ─── Score Badge ─── */
+    /* ─── SCORE BADGE ─── */
     .score-badge {
         display: inline-flex;
         align-items: center;
@@ -333,14 +410,14 @@ st.markdown("""
         font-weight: 900;
         color: white;
         box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-        animation: pulseSoft 3s ease-in-out infinite;
+        transition: all var(--transition-speed);
         flex-shrink: 0;
     }
     .score-high { background: linear-gradient(135deg, #10b981, #059669); }
     .score-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
     .score-low { background: linear-gradient(135deg, #ef4444, #dc2626); }
 
-    /* ─── Rank Badge ─── */
+    /* ─── RANK BADGE ─── */
     .rank-badge {
         display: inline-flex;
         align-items: center;
@@ -349,13 +426,14 @@ st.markdown("""
         font-weight: 800;
         font-size: 1rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: all var(--transition-speed);
     }
     .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; }
     .rank-2 { background: linear-gradient(135deg, #d1d5db, #9ca3af); color: #374151; }
     .rank-3 { background: linear-gradient(135deg, #fb923c, #f97316); color: #ffffff; }
     .rank-other { background: linear-gradient(135deg, #e2e8f0, #cbd5e1); color: #475569; }
 
-    /* ─── Skill Badges ─── */
+    /* ─── SKILL BADGES ─── */
     .skill-badge {
         display: inline-block;
         padding: 0.45rem 0.9rem;
@@ -363,7 +441,7 @@ st.markdown("""
         font-size: 0.82rem;
         font-weight: 700;
         margin: 0.25rem;
-        transition: transform 0.2s ease;
+        transition: all var(--transition-speed);
     }
     .skill-badge:hover { transform: scale(1.05); }
     .skill-matched {
@@ -382,7 +460,7 @@ st.markdown("""
         border: 1px solid #93c5fd;
     }
 
-    /* ─── Candidate Card ─── */
+    /* ─── CANDIDATE CARD ─── */
     .candidate-card {
         background: var(--card-bg);
         border-radius: 20px;
@@ -390,8 +468,8 @@ st.markdown("""
         margin-bottom: 1.5rem;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
         border: 1px solid var(--border);
-        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        animation: slideInRight 0.5s ease-out;
+        transition: all var(--transition-speed);
+        animation: fadeIn 0.5s ease-in-out;
     }
     .candidate-card:hover {
         transform: translateY(-6px);
@@ -410,7 +488,7 @@ st.markdown("""
         color: var(--text-muted);
     }
 
-    /* ─── Progress Bar ─── */
+    /* ─── PROGRESS BAR ─── */
     .progress-container {
         width: 100%;
         height: 8px;
@@ -426,7 +504,7 @@ st.markdown("""
         transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* ─── Summary Box ─── */
+    /* ─── SUMMARY BOX ─── */
     .summary-box {
         background: linear-gradient(135deg, rgba(248, 250, 252, 0.9), rgba(241, 245, 249, 0.9));
         border-left: 4px solid var(--primary);
@@ -449,7 +527,7 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    /* ─── File Tags ─── */
+    /* ─── FILE TAGS ─── */
     .file-tag {
         display: inline-flex;
         align-items: center;
@@ -462,57 +540,11 @@ st.markdown("""
         font-size: 0.82rem;
         font-weight: 700;
         border: 1px solid #93c5fd;
-        transition: transform 0.2s ease;
+        transition: all var(--transition-speed);
     }
     .file-tag:hover { transform: scale(1.03); }
 
-    /* ─── Analyze Button ─── */
-    .analyze-btn-wrapper .stButton > button {
-        background: linear-gradient(135deg, #ef4444 0%, #f97316 50%, #f59e0b 100%) !important;
-        color: white !important;
-        font-weight: 800 !important;
-        font-size: 1.1rem !important;
-        padding: 0.9rem 3rem !important;
-        border-radius: 14px !important;
-        border: none !important;
-        box-shadow: 0 8px 30px rgba(239, 68, 68, 0.3) !important;
-        transition: all 0.3s ease !important;
-        letter-spacing: 0.02em !important;
-    }
-    .analyze-btn-wrapper .stButton > button:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 12px 40px rgba(239, 68, 68, 0.4) !important;
-    }
-
-    /* ─── Streamlit overrides ─── */
-    .stTextArea textarea {
-        border-radius: 12px !important;
-        border: 1.5px solid var(--border) !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-        padding: 1rem !important;
-        transition: border-color 0.2s ease !important;
-        background: #f8fafc !important;
-    }
-    .stTextArea textarea:focus {
-        border-color: var(--primary) !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-    }
-
-    .stFileUploader {
-        border-radius: 16px !important;
-    }
-
-    [data-testid="stFileUploader"] > div {
-        border-radius: 16px !important;
-        border: 2px dashed rgba(59, 130, 246, 0.3) !important;
-        padding: 1.5rem !important;
-        transition: all 0.2s ease !important;
-    }
-    [data-testid="stFileUploader"] > div:hover {
-        border-color: rgba(59, 130, 246, 0.6) !important;
-        background: rgba(59, 130, 246, 0.02) !important;
-    }
-
+    /* ─── STREAMLIT OVERRIDES ─── */
     div[data-testid="stExpander"] {
         border-radius: 16px !important;
         border: 1px solid var(--border) !important;
@@ -641,14 +673,14 @@ def main():
     st.markdown('<div class="modern-card">', unsafe_allow_html=True)
     st.markdown('<div class="card-title">📋 Job Description</div>', unsafe_allow_html=True)
     st.markdown('<div class="card-subtitle">Enter the job requirements to match against resumes</div>', unsafe_allow_html=True)
-    job_desc = st.text_area("", height=130, placeholder="e.g. Full-stack developer with React, Node.js, AWS experience. 3+ years required...", label_visibility="collapsed")
+    job_desc = st.text_area("Job Description", height=130, placeholder="e.g. Full-stack developer with React, Node.js, AWS experience. 3+ years required...", label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
 
     # ── Upload Resumes ──
     st.markdown('<div class="modern-card">', unsafe_allow_html=True)
     st.markdown('<div class="card-title">📄 Upload Resumes</div>', unsafe_allow_html=True)
     st.markdown('<div class="card-subtitle">Select PDF resume files to analyze</div>', unsafe_allow_html=True)
-    files = st.file_uploader("Upload PDF files", type=["pdf"], accept_multiple_files=True, label_visibility="collapsed")
+    files = st.file_uploader("Resume Files", type=["pdf"], accept_multiple_files=True, label_visibility="collapsed")
 
     if files:
         st.markdown("**Selected Files:**")
