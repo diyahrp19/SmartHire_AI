@@ -131,440 +131,423 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
     :root {
-        --primary: #3b82f6;
-        --primary-dark: #1e3a8a;
-        --accent: #06b6d4;
-        --success: #10b981;
-        --success-light: #d1fae5;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --danger-light: #fee2e2;
-        --light-bg: #f5f6fa;
-        --card-bg: #ffffff;
-        --text-dark: #0f172a;
-        --text-muted: #64748b;
-        --border: #e2e8f0;
+        --ink-900: #1e293b;
+        --ink-700: #334155;
+        --ink-500: #64748b;
+        --paper: #f8fbff;
+        --panel: #f1f7ff;
+        --line: #dbe7f5;
+        --brand: #2563eb;
+        --brand-strong: #1d4ed8;
+        --brand-soft: #bfdbfe;
+        --teal: #0ea5e9;
+        --danger: #dc2626;
+        --ok: #16a34a;
     }
 
-    /* Page Load Animation */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+    @keyframes riseIn {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Smooth Transitions */
-    :root {
-        --transition-speed: 0.3s ease-in-out;
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(-10px, 10px) scale(1.05); }
+        100% { transform: translate(0, 0) scale(1); }
     }
 
     body, [data-testid="stAppViewContainer"] {
-        background-color: var(--light-bg) !important;
-        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
-        animation: fadeIn 0.5s ease-in-out;
+        font-family: 'Manrope', system-ui, -apple-system, sans-serif !important;
+        background:
+            radial-gradient(1200px 500px at 10% -15%, rgba(59, 130, 246, 0.18), transparent 55%),
+            radial-gradient(900px 480px at 95% 0%, rgba(125, 211, 252, 0.2), transparent 50%),
+            linear-gradient(180deg, #f4f9ff 0%, #ecf5ff 45%, #f8fbff 100%) !important;
+        color: var(--ink-900);
     }
 
-    [data-testid="stHeader"] { background: transparent !important; }
+    [data-testid="stHeader"] {
+        background: transparent !important;
+    }
 
-    /* ─── HERO HEADER: Wide rectangular div with deep blue gradient background ─── */
-    .hero-header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
-        background-size: 400% 400%;
-        padding: 3.5rem 2.5rem;
-        border-radius: 24px;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 20px 60px rgba(30, 58, 138, 0.2);
+    .block-container {
+        padding-top: 1.2rem !important;
+        padding-bottom: 3rem !important;
+        max-width: 1150px !important;
+    }
+
+    .hero-shell {
         position: relative;
         overflow: hidden;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        animation: fadeIn 0.5s ease-in-out;
+        border-radius: 28px;
+        padding: 2.6rem 2.3rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(130deg, #f0f9ff 0%, #dbeafe 50%, #e0e7ff 100%);
+        box-shadow: 0 20px 44px rgba(59, 130, 246, 0.18);
+        animation: riseIn 0.55s ease-out;
     }
 
-    .hero-header::before {
-        content: '';
+    .hero-shell::before,
+    .hero-shell::after {
+        content: "";
         position: absolute;
-        top: -50%;
-        right: -30%;
-        width: 160%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
-        animation: float 6s ease-in-out infinite;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        filter: blur(4px);
+        animation: floatBlob 7s ease-in-out infinite;
     }
 
-    .app-title {
-        font-size: 2.8rem;
-        font-weight: 900;
-        color: #ffffff;
-        margin: 0 0 0.5rem 0;
-        text-shadow: 0 2px 15px rgba(0,0,0,0.15);
-        letter-spacing: -0.02em;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        justify-content: center;
+    .hero-shell::before {
+        top: -110px;
+        right: -60px;
+        background: radial-gradient(circle, rgba(96, 165, 250, 0.28), transparent 68%);
     }
 
-    .app-subtitle {
-        font-size: 1.05rem;
-        color: rgba(255,255,255,0.9);
-        margin: 0;
-        font-weight: 500;
-        letter-spacing: 0.01em;
+    .hero-shell::after {
+        bottom: -120px;
+        left: -80px;
+        background: radial-gradient(circle, rgba(129, 140, 248, 0.25), transparent 68%);
     }
 
-    /* ─── MODERN CARD: White background with light gray border ─── */
-    .modern-card {
-        background: var(--card-bg);
-        border-radius: 20px;
-        padding: 2rem 2.2rem;
-        margin-bottom: 1.8rem;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-        border: 1px solid var(--border);
-        transition: all var(--transition-speed);
+    .hero-title {
         position: relative;
-        overflow: hidden;
-        animation: fadeIn 0.5s ease-in-out;
-    }
-
-    .card-title {
-        font-size: 1.35rem;
+        margin: 0;
+        font-size: 2.55rem;
         font-weight: 800;
-        color: var(--text-dark);
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        letter-spacing: -0.03em;
+        color: #1e293b;
     }
 
-    .card-subtitle {
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        margin-bottom: 1.2rem;
+    .hero-subtitle {
+        position: relative;
+        margin: 0.7rem 0 0;
+        max-width: 760px;
+        color: #334155;
+        line-height: 1.65;
+        font-size: 1.02rem;
     }
 
-    /* ─── TEXTAREA: Document icon label with focus-within effect ─── */
-    .textarea-container {
-        margin-bottom: 1.5rem;
-    }
-    
-    .textarea-label {
+    .hero-pills {
+        position: relative;
+        margin-top: 1.2rem;
         display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 600;
-        color: var(--text-dark);
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
+        flex-wrap: wrap;
+        gap: 0.6rem;
     }
-    
+
+    .hero-pill {
+        background: rgba(255, 255, 255, 0.78);
+        color: #1d4ed8;
+        border: 1px solid rgba(147, 197, 253, 0.45);
+        border-radius: 999px;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .panel-card {
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(241, 247, 255, 0.9));
+        border-radius: 22px;
+        padding: 1.25rem 1.35rem;
+        margin: 0 0 1.1rem;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12);
+        backdrop-filter: blur(6px);
+        animation: riseIn 0.5s ease-out;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        border: 1px solid var(--line) !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(241, 247, 255, 0.9)) !important;
+        border-radius: 22px !important;
+        padding: 0.7rem 0.85rem !important;
+        margin-bottom: 1.1rem !important;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12) !important;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"]:has(.section-title) {
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"]:has(.section-title):hover {
+        transform: translateY(-3px);
+        border-color: #93c5fd !important;
+        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.18) !important;
+    }
+
+    .stTextArea [data-baseweb="textarea"] {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .stTextArea [data-baseweb="textarea"]:focus-within {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .section-title {
+        margin: 0;
+        color: var(--ink-900);
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .section-note {
+        margin: 0.38rem 0 0.85rem;
+        color: var(--ink-500);
+        font-size: 0.87rem;
+    }
+
     .stTextArea textarea {
-        border-radius: 12px !important;
-        border: 1.5px solid var(--border) !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-        padding: 1rem !important;
-        transition: all var(--transition-speed) !important;
-        background: #f8fafc !important;
-        color: var(--text-dark) !important;
-    }
-    
-    .stTextArea:focus-within textarea {
-        border-color: var(--primary) !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25) !important;
+        border-radius: 14px !important;
+        border: 1.7px solid var(--line) !important;
+        background: #f8fbff !important;
+        color: var(--ink-900) !important;
+        font-size: 0.95rem !important;
+        line-height: 1.55 !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
     }
 
-    /* ─── FILE UPLOADER: Dashed border with hover effects ─── */
-    .file-uploader-container {
-        margin-bottom: 1.5rem;
+    .stTextArea textarea:focus {
+        border-color: var(--brand) !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
+        outline: none !important;
     }
-    
+
+    .stTextArea textarea:focus-visible {
+        outline: none !important;
+    }
+
     [data-testid="stFileUploader"] > div {
+        border: 2px dashed rgba(37, 99, 235, 0.45) !important;
         border-radius: 16px !important;
-        border: 2px dashed rgba(59, 130, 246, 0.3) !important;
-        padding: 1.5rem !important;
-        transition: all var(--transition-speed) !important;
-        background: rgba(248, 250, 252, 0.8) !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-    
-    [data-testid="stFileUploader"] > div:hover {
-        border-color: var(--primary) !important;
-        background: rgba(59, 130, 246, 0.05) !important;
-        transform: scale(1.02);
-    }
-    
-    .upload-icon {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-        transition: transform 0.2s ease;
-    }
-    
-    [data-testid="stFileUploader"] > div:hover .upload-icon {
-        transform: scale(1.05);
+        background: linear-gradient(180deg, #eef5ff, #f8fbff) !important;
+        transition: all 0.2s ease !important;
     }
 
-    /* ─── ANALYZE BUTTON: Orange background with rocket icon ─── */
-    .analyze-btn-wrapper .stButton > button {
-        background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%) !important;
-        color: white !important;
-        font-weight: 800 !important;
-        font-size: 1.1rem !important;
-        padding: 0.9rem 3rem !important;
+    [data-testid="stFileUploader"] > div:hover {
+        border-color: var(--brand) !important;
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.2) !important;
+        transform: translateY(-1px);
+    }
+
+    .selected-file {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin: 0.25rem 0.32rem 0 0;
+        border-radius: 999px;
+        border: 1px solid #bfdbfe;
+        background: #eaf2ff;
+        color: #1e40af;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.79rem;
+        font-weight: 700;
+    }
+
+    .cta-wrap .stButton > button {
         border-radius: 14px !important;
         border: none !important;
-        box-shadow: 0 8px 30px rgba(249, 115, 22, 0.3) !important;
-        transition: all 0.2s ease-in-out !important;
-        letter-spacing: 0.02em !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        width: 100%;
-    }
-    
-    .analyze-btn-wrapper .stButton > button:hover {
-        background: linear-gradient(135deg, #ea580c 0%, #d97706 100%) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 12px 40px rgba(249, 115, 22, 0.4) !important;
+        padding: 0.86rem 1rem !important;
+        font-weight: 800 !important;
+        font-size: 1rem !important;
+        background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%) !important;
+        color: #fff !important;
+        box-shadow: 0 14px 26px rgba(37, 99, 235, 0.28) !important;
+        transition: all 0.22s ease !important;
     }
 
-    /* ─── SECTION HEADERS ─── */
-    .section-header {
-        font-size: 1.7rem;
+    .cta-wrap .stButton > button:hover {
+        transform: translateY(-2px) scale(1.01) !important;
+        box-shadow: 0 18px 30px rgba(37, 99, 235, 0.35) !important;
+        background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%) !important;
+    }
+
+    .results-heading {
+        margin: 1rem 0 0.55rem;
+        font-size: 1.45rem;
+        color: var(--ink-900);
+        letter-spacing: -0.025em;
         font-weight: 800;
-        color: var(--text-dark);
-        margin: 2.5rem 0 1.5rem 0;
-        padding-bottom: 0.8rem;
-        border-bottom: 3px solid var(--primary);
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        animation: fadeIn 0.5s ease-in-out;
     }
 
-    .sub-header {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin: 1.5rem 0 1rem 0;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    /* ─── METRICS ─── */
-    .metric-card {
-        background: var(--card-bg);
+    .kpi-card {
         border-radius: 16px;
-        padding: 1.8rem 1.2rem;
+        border: 1px solid var(--line);
+        background: #f8fbff;
+        padding: 1.05rem;
         text-align: center;
-        border: 1px solid var(--border);
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-        transition: all var(--transition-speed);
-        animation: fadeIn 0.5s ease-in-out;
-    }
-    .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 6px 14px rgba(37, 99, 235, 0.08);
     }
 
-    .metric-value {
-        font-size: 2.8rem;
-        font-weight: 900;
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        line-height: 1.2;
-    }
-
-    .metric-label {
-        font-size: 0.78rem;
-        color: var(--text-muted);
-        font-weight: 700;
+    .kpi-label {
+        color: var(--ink-500);
+        font-size: 0.74rem;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-top: 0.3rem;
-    }
-
-    /* ─── SCORE BADGE ─── */
-    .score-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        font-size: 1.6rem;
-        font-weight: 900;
-        color: white;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-        transition: all var(--transition-speed);
-        flex-shrink: 0;
-    }
-    .score-high { background: linear-gradient(135deg, #10b981, #059669); }
-    .score-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .score-low { background: linear-gradient(135deg, #ef4444, #dc2626); }
-
-    /* ─── RANK BADGE ─── */
-    .rank-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.6rem 1.2rem;
-        border-radius: 12px;
         font-weight: 800;
-        font-size: 1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: all var(--transition-speed);
-    }
-    .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; }
-    .rank-2 { background: linear-gradient(135deg, #d1d5db, #9ca3af); color: #374151; }
-    .rank-3 { background: linear-gradient(135deg, #fb923c, #f97316); color: #ffffff; }
-    .rank-other { background: linear-gradient(135deg, #e2e8f0, #cbd5e1); color: #475569; }
-
-    /* ─── SKILL BADGES ─── */
-    .skill-badge {
-        display: inline-block;
-        padding: 0.45rem 0.9rem;
-        border-radius: 20px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        margin: 0.25rem;
-        transition: all var(--transition-speed);
-    }
-    .skill-badge:hover { transform: scale(1.05); }
-    .skill-matched {
-        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-        color: #065f46;
-        border: 1px solid #6ee7b7;
-    }
-    .skill-missing {
-        background: linear-gradient(135deg, #fee2e2, #fecaca);
-        color: #7f1d1d;
-        border: 1px solid #fca5a5;
-    }
-    .skill-extra {
-        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-        color: #1e40af;
-        border: 1px solid #93c5fd;
     }
 
-    /* ─── CANDIDATE CARD ─── */
+    .kpi-value {
+        margin-top: 0.25rem;
+        color: var(--brand-strong);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
     .candidate-card {
-        background: var(--card-bg);
         border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-        border: 1px solid var(--border);
-        transition: all var(--transition-speed);
-        animation: fadeIn 0.5s ease-in-out;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, #f8fbff, #edf4ff);
+        padding: 1.2rem;
+        margin-bottom: 0.9rem;
+        box-shadow: 0 12px 25px rgba(37, 99, 235, 0.12);
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
     }
+
     .candidate-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 16px 30px rgba(37, 99, 235, 0.18);
     }
 
     .candidate-name {
-        font-size: 1.15rem;
+        margin: 0;
+        font-size: 1.02rem;
         font-weight: 800;
-        color: var(--text-dark);
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
+        color: var(--ink-900);
+        letter-spacing: -0.01em;
     }
+
     .candidate-email {
-        font-size: 0.85rem;
-        color: var(--text-muted);
+        margin: 0.2rem 0 0;
+        color: var(--ink-700);
+        font-size: 0.82rem;
     }
 
-    /* ─── PROGRESS BAR ─── */
-    .progress-container {
-        width: 100%;
-        height: 8px;
-        background: #e2e8f0;
-        border-radius: 10px;
-        overflow: hidden;
-        margin: 0.8rem 0;
-    }
-    .progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        border-radius: 10px;
-        transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* ─── SUMMARY BOX ─── */
-    .summary-box {
-        background: linear-gradient(135deg, rgba(248, 250, 252, 0.9), rgba(241, 245, 249, 0.9));
-        border-left: 4px solid var(--primary);
-        border-radius: 12px;
-        padding: 1.2rem 1.5rem;
-        margin-top: 1.2rem;
-    }
-    .summary-title {
-        font-size: 0.85rem;
-        font-weight: 800;
-        color: var(--text-dark);
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        margin-bottom: 0.4rem;
-    }
-    .summary-text {
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        line-height: 1.6;
-    }
-
-    /* ─── FILE TAGS ─── */
-    .file-tag {
+    .score-badge {
+        width: 66px;
+        height: 66px;
+        border-radius: 18px;
         display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
-        background: linear-gradient(135deg, #dbeafe, #bae6fd);
-        color: #1e40af;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        margin: 0.3rem;
-        font-size: 0.82rem;
-        font-weight: 700;
-        border: 1px solid #93c5fd;
-        transition: all var(--transition-speed);
+        justify-content: center;
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #fff;
     }
-    .file-tag:hover { transform: scale(1.03); }
 
-    /* ─── STREAMLIT OVERRIDES ─── */
-    div[data-testid="stExpander"] {
-        border-radius: 16px !important;
-        border: 1px solid var(--border) !important;
+    .score-high { background: linear-gradient(135deg, #1e40af, #1d4ed8); }
+    .score-medium { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+    .score-low { background: linear-gradient(135deg, #60a5fa, #93c5fd); }
+
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 56px;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 800;
+        padding: 0.45rem 0.75rem;
+    }
+
+    .rank-1 { background: #dbeafe; color: #1d4ed8; }
+    .rank-2 { background: #e0e7ff; color: #4338ca; }
+    .rank-3 { background: #e0f2fe; color: #0369a1; }
+    .rank-other { background: #eff6ff; color: #334155; }
+
+    .meter-track {
+        width: 100%;
+        height: 8px;
+        background: #dbe7f5;
+        border-radius: 999px;
+        margin: 0.9rem 0 0.55rem;
         overflow: hidden;
+    }
+
+    .meter-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #2563eb, #38bdf8);
+    }
+
+    .skill-badge {
+        display: inline-block;
+        padding: 0.32rem 0.65rem;
+        border-radius: 999px;
+        margin: 0.14rem;
+        font-size: 0.76rem;
+        font-weight: 700;
+    }
+
+    .skill-matched { background: #dbeafe; color: #1e3a8a; border: 1px solid #93c5fd; }
+    .skill-missing { background: #e0e7ff; color: #3730a3; border: 1px solid #a5b4fc; }
+    .skill-extra { background: #e0f2fe; color: #0c4a6e; border: 1px solid #7dd3fc; }
+
+    .summary-box {
+        margin-top: 0.85rem;
+        border-left: 4px solid var(--brand);
+        border-radius: 11px;
+        background: #eff6ff;
+        padding: 0.9rem 1rem;
+    }
+
+    .summary-title {
+        margin: 0;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #1d4ed8;
+        letter-spacing: 0.08em;
+        font-weight: 800;
+    }
+
+    .summary-text {
+        margin: 0.35rem 0 0;
+        font-size: 0.85rem;
+        line-height: 1.56;
+        color: var(--ink-700);
     }
 
     .stProgress > div > div > div {
-        background: linear-gradient(90deg, var(--primary), var(--accent)) !important;
-        border-radius: 10px !important;
+        border-radius: 999px !important;
+        background: linear-gradient(90deg, #2563eb, #38bdf8) !important;
+    }
+
+    div[data-testid="stExpander"] {
+        border-radius: 14px !important;
+        border: 1px solid var(--line) !important;
+        background: #f8fbff !important;
     }
 
     hr {
         border: none;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, var(--border), transparent);
-        margin: 2rem 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #c7d9f0, transparent);
+        margin: 1.3rem 0;
+    }
+
+    @media (max-width: 900px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-shell {
+            padding: 2rem 1.25rem;
+        }
+
+        .kpi-value {
+            font-size: 1.65rem;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
-
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -581,9 +564,9 @@ def get_score_class(score: int) -> str:
     return "score-low"
 
 def get_score_color(score: int) -> str:
-    if score >= 80: return "#10b981"
-    if score >= 60: return "#f59e0b"
-    return "#ef4444"
+    if score >= 80: return "#1d4ed8"
+    if score >= 60: return "#3b82f6"
+    return "#93c5fd"
 
 
 # ─── Charts ──────────────────────────────────────────────────────────────────
@@ -615,9 +598,9 @@ def create_skill_chart(results):
 
     fig = go.Figure()
     fig.add_trace(go.Bar(y=names, x=matched, name="✅ Matched", orientation="h",
-                         marker=dict(color="#10b981", cornerradius=4)))
+                         marker=dict(color="#1d4ed8", cornerradius=4)))
     fig.add_trace(go.Bar(y=names, x=missing, name="❌ Missing", orientation="h",
-                         marker=dict(color="#ef4444", cornerradius=4)))
+                         marker=dict(color="#93c5fd", cornerradius=4)))
     fig.update_layout(
         title=dict(text="🎯 Skill Analysis", font=dict(size=18, family="Plus Jakarta Sans", weight=800)),
         barmode="group", height=max(300, len(names) * 50),
@@ -661,41 +644,46 @@ def process_resume(uploaded_file, job_desc: str) -> Dict[str, Any]:
 # ─── Main App ────────────────────────────────────────────────────────────────
 
 def main():
-    # Hero Header
     st.markdown("""
-    <div class="hero-header">
-        <div class="app-title">🚀 SmartHire AI</div>
-        <div class="app-subtitle">AI-powered resume screening and intelligent candidate ranking</div>
+    <div class="hero-shell">
+        <h1 class="hero-title">SmartHire AI</h1>
+        <p class="hero-subtitle">
+            Screen resumes with confidence, rank candidates intelligently, and uncover skill-fit insights in a clean recruiter dashboard.
+        </p>
+        <div class="hero-pills">
+            <span class="hero-pill">Resume Intelligence</span>
+            <span class="hero-pill">Skill Match Scoring</span>
+            <span class="hero-pill">Visual Candidate Ranking</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Job Description ──
-    st.markdown('<div class="modern-card">', unsafe_allow_html=True)
-    st.markdown('<div class="card-title">📋 Job Description</div>', unsafe_allow_html=True)
-    st.markdown('<div class="card-subtitle">Enter the job requirements to match against resumes</div>', unsafe_allow_html=True)
-    job_desc = st.text_area("Job Description", height=130, placeholder="e.g. Full-stack developer with React, Node.js, AWS experience. 3+ years required...", label_visibility="collapsed")
-    st.markdown('</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<p class="section-title">Job Description</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-note">Describe the role requirements, skills, and experience expectations.</p>', unsafe_allow_html=True)
+        job_desc = st.text_area(
+            "Job Description",
+            height=150,
+            placeholder="Example: Hiring a full-stack engineer with React, Node.js, PostgreSQL, AWS, and CI/CD experience. 3+ years preferred.",
+            label_visibility="collapsed",
+        )
 
-    # ── Upload Resumes ──
-    st.markdown('<div class="modern-card">', unsafe_allow_html=True)
-    st.markdown('<div class="card-title">📄 Upload Resumes</div>', unsafe_allow_html=True)
-    st.markdown('<div class="card-subtitle">Select PDF resume files to analyze</div>', unsafe_allow_html=True)
-    files = st.file_uploader("Resume Files", type=["pdf"], accept_multiple_files=True, label_visibility="collapsed")
+    with st.container(border=True):
+        st.markdown('<p class="section-title">Upload Resume PDFs</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-note">Drop one or more PDF files to evaluate candidates against your role.</p>', unsafe_allow_html=True)
+        files = st.file_uploader("Resume Files", type=["pdf"], accept_multiple_files=True, label_visibility="collapsed")
 
-    if files:
-        st.markdown("**Selected Files:**")
-        tags = "".join([f'<span class="file-tag">📄 {f.name}</span>' for f in files])
-        st.markdown(tags, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+        if files:
+            selected_tags = "".join([f'<span class="selected-file">PDF {f.name}</span>' for f in files])
+            st.markdown(selected_tags, unsafe_allow_html=True)
 
-    # ── Analyze Button ──
-    col1, col2, col3 = st.columns([1.2, 1, 1.2])
-    with col2:
-        st.markdown('<div class="analyze-btn-wrapper">', unsafe_allow_html=True)
-        analyze_btn = st.button("🚀 Analyze Candidates", use_container_width=True, type="primary")
-        st.markdown('</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        cta_col_l, cta_col_c, cta_col_r = st.columns([1, 1.3, 1])
+        with cta_col_c:
+            st.markdown('<div class="cta-wrap">', unsafe_allow_html=True)
+            analyze_btn = st.button("Analyze Candidates", use_container_width=True, type="primary")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Results ──
     if analyze_btn:
         if not job_desc.strip():
             st.error("⚠️ Please enter a job description before analyzing.")
@@ -705,7 +693,7 @@ def main():
             return
 
         st.markdown("---")
-        st.markdown('<div class="section-header">🎯 Screening Results</div>', unsafe_allow_html=True)
+        st.markdown('<h2 class="results-heading">Screening Results</h2>', unsafe_allow_html=True)
 
         progress = st.progress(0)
         status = st.empty()
@@ -735,7 +723,7 @@ def main():
         successful.sort(key=lambda x: x["ai_analysis"]["match_score"], reverse=True)
 
         # ── Summary Metrics ──
-        st.markdown('<div class="sub-header">📊 Summary</div>', unsafe_allow_html=True)
+        st.markdown('<p class="section-title">Summary</p>', unsafe_allow_html=True)
 
         m1, m2, m3, m4 = st.columns(4)
         avg = sum(r["ai_analysis"]["match_score"] for r in successful) / len(successful)
@@ -750,16 +738,16 @@ def main():
         ]:
             with col:
                 st.markdown(f'''
-                <div class="metric-card">
-                    <div class="metric-label">{label}</div>
-                    <div class="metric-value">{value}</div>
+                <div class="kpi-card">
+                    <div class="kpi-label">{label}</div>
+                    <div class="kpi-value">{value}</div>
                 </div>
                 ''', unsafe_allow_html=True)
 
         st.markdown("---")
 
         # ── Candidate Rankings ──
-        st.markdown('<div class="sub-header">👥 Candidate Rankings</div>', unsafe_allow_html=True)
+        st.markdown('<p class="section-title">Candidate Rankings</p>', unsafe_allow_html=True)
 
         for idx, r in enumerate(successful):
             rank = idx + 1
@@ -781,24 +769,24 @@ def main():
 
             # Progress bar
             st.markdown(f'''
-            <div class="progress-container">
-                <div class="progress-bar" style="width: {score}%;"></div>
+            <div class="meter-track">
+                <div class="meter-fill" style="width: {score}%;"></div>
             </div>
             ''', unsafe_allow_html=True)
 
             # Skills
             if analysis["matched_skills"]:
-                st.markdown("**✅ Matched Skills:**")
+                st.markdown("**Matched Skills:**")
                 skills_html = " ".join([f'<span class="skill-badge skill-matched">{s}</span>' for s in analysis["matched_skills"]])
                 st.markdown(skills_html, unsafe_allow_html=True)
 
             if analysis["missing_skills"]:
-                st.markdown("**❌ Missing Skills:**")
+                st.markdown("**Missing Skills:**")
                 skills_html = " ".join([f'<span class="skill-badge skill-missing">{s}</span>' for s in analysis["missing_skills"]])
                 st.markdown(skills_html, unsafe_allow_html=True)
 
             if analysis.get("extra_skills"):
-                st.markdown("**🌟 Extra Skills:**")
+                st.markdown("**Extra Skills:**")
                 skills_html = " ".join([f'<span class="skill-badge skill-extra">{s}</span>' for s in analysis["extra_skills"]])
                 st.markdown(skills_html, unsafe_allow_html=True)
 
@@ -815,7 +803,7 @@ def main():
         st.markdown("---")
 
         # ── Data Visualization ──
-        st.markdown('<div class="sub-header">📈 Data Visualization</div>', unsafe_allow_html=True)
+        st.markdown('<p class="section-title">Data Visualization</p>', unsafe_allow_html=True)
 
         ch1, ch2 = st.columns(2)
         with ch1:
