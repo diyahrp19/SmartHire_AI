@@ -182,11 +182,19 @@ st.markdown("""
         position: relative;
         overflow: hidden;
         border-radius: 28px;
+        border: 1px solid transparent;
         padding: 2.6rem 2.3rem;
         margin-bottom: 1.5rem;
         background: linear-gradient(130deg, #f0f9ff 0%, #dbeafe 50%, #e0e7ff 100%);
         box-shadow: 0 20px 44px rgba(59, 130, 246, 0.18);
+        transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
         animation: riseIn 0.55s ease-out;
+    }
+
+    .hero-shell:hover {
+        transform: translateY(-4px);
+        border-color: #60a5fa;
+        box-shadow: 0 24px 52px rgba(37, 99, 235, 0.24);
     }
 
     .hero-shell::before,
@@ -274,6 +282,16 @@ st.markdown("""
     }
 
     [data-testid="stVerticalBlockBorderWrapper"]:has(.section-title):hover {
+        transform: translateY(-3px);
+        border-color: #93c5fd !important;
+        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.18) !important;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"]:has(.cta-wrap) {
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"]:has(.cta-wrap):hover {
         transform: translateY(-3px);
         border-color: #93c5fd !important;
         box-shadow: 0 16px 28px rgba(37, 99, 235, 0.18) !important;
