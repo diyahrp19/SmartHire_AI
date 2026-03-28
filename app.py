@@ -279,6 +279,21 @@ st.markdown("""
         box-shadow: 0 16px 28px rgba(37, 99, 235, 0.18) !important;
     }
 
+    [data-testid="stVerticalBlockBorderWrapper"]:has(.candidate-name) {
+        border: 1px solid var(--line) !important;
+        background: linear-gradient(180deg, #f8fbff, #edf4ff) !important;
+        border-radius: 20px !important;
+        padding: 0.8rem 0.9rem !important;
+        box-shadow: 0 12px 25px rgba(37, 99, 235, 0.12) !important;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"]:has(.candidate-name):hover {
+        transform: translateY(-3px);
+        border-color: #93c5fd !important;
+        box-shadow: 0 16px 30px rgba(37, 99, 235, 0.18) !important;
+    }
+
     .stTextArea [data-baseweb="textarea"] {
         border: none !important;
         box-shadow: none !important;
@@ -351,7 +366,8 @@ st.markdown("""
         font-weight: 700;
     }
 
-    .cta-wrap .stButton > button {
+    .stButton > button[kind="primary"],
+    .stButton > button[data-testid="stBaseButton-primary"] {
         border-radius: 14px !important;
         border: none !important;
         padding: 0.86rem 1rem !important;
@@ -363,7 +379,8 @@ st.markdown("""
         transition: all 0.22s ease !important;
     }
 
-    .cta-wrap .stButton > button:hover {
+    .stButton > button[kind="primary"]:hover,
+    .stButton > button[data-testid="stBaseButton-primary"]:hover {
         transform: translateY(-2px) scale(1.01) !important;
         box-shadow: 0 18px 30px rgba(37, 99, 235, 0.35) !important;
         background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%) !important;
@@ -756,49 +773,46 @@ def main():
             name = r["structured_data"].get("name", "Unknown")
             email = r["structured_data"].get("email", "N/A")
 
-            st.markdown(f'<div class="candidate-card">', unsafe_allow_html=True)
+            with st.container(border=True):
+                c1, c2, c3 = st.columns([1, 4, 1])
+                with c1:
+                    st.markdown(f'<div class="score-badge {get_score_class(score)}">{score}</div>', unsafe_allow_html=True)
+                with c2:
+                    st.markdown(f'<div class="candidate-name">{name}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="candidate-email">{email}</div>', unsafe_allow_html=True)
+                with c3:
+                    st.markdown(f'<div class="rank-badge {get_rank_class(rank)}">{get_rank_badge(rank)}</div>', unsafe_allow_html=True)
 
-            c1, c2, c3 = st.columns([1, 4, 1])
-            with c1:
-                st.markdown(f'<div class="score-badge {get_score_class(score)}">{score}</div>', unsafe_allow_html=True)
-            with c2:
-                st.markdown(f'<div class="candidate-name">{name}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="candidate-email">{email}</div>', unsafe_allow_html=True)
-            with c3:
-                st.markdown(f'<div class="rank-badge {get_rank_class(rank)}">{get_rank_badge(rank)}</div>', unsafe_allow_html=True)
+                # Progress bar
+                st.markdown(f'''
+                <div class="meter-track">
+                    <div class="meter-fill" style="width: {score}%;"></div>
+                </div>
+                ''', unsafe_allow_html=True)
 
-            # Progress bar
-            st.markdown(f'''
-            <div class="meter-track">
-                <div class="meter-fill" style="width: {score}%;"></div>
-            </div>
-            ''', unsafe_allow_html=True)
+                # Skills
+                if analysis["matched_skills"]:
+                    st.markdown("**Matched Skills:**")
+                    skills_html = " ".join([f'<span class="skill-badge skill-matched">{s}</span>' for s in analysis["matched_skills"]])
+                    st.markdown(skills_html, unsafe_allow_html=True)
 
-            # Skills
-            if analysis["matched_skills"]:
-                st.markdown("**Matched Skills:**")
-                skills_html = " ".join([f'<span class="skill-badge skill-matched">{s}</span>' for s in analysis["matched_skills"]])
-                st.markdown(skills_html, unsafe_allow_html=True)
+                if analysis["missing_skills"]:
+                    st.markdown("**Missing Skills:**")
+                    skills_html = " ".join([f'<span class="skill-badge skill-missing">{s}</span>' for s in analysis["missing_skills"]])
+                    st.markdown(skills_html, unsafe_allow_html=True)
 
-            if analysis["missing_skills"]:
-                st.markdown("**Missing Skills:**")
-                skills_html = " ".join([f'<span class="skill-badge skill-missing">{s}</span>' for s in analysis["missing_skills"]])
-                st.markdown(skills_html, unsafe_allow_html=True)
+                if analysis.get("extra_skills"):
+                    st.markdown("**Extra Skills:**")
+                    skills_html = " ".join([f'<span class="skill-badge skill-extra">{s}</span>' for s in analysis["extra_skills"]])
+                    st.markdown(skills_html, unsafe_allow_html=True)
 
-            if analysis.get("extra_skills"):
-                st.markdown("**Extra Skills:**")
-                skills_html = " ".join([f'<span class="skill-badge skill-extra">{s}</span>' for s in analysis["extra_skills"]])
-                st.markdown(skills_html, unsafe_allow_html=True)
-
-            # AI Summary
-            st.markdown(f'''
-            <div class="summary-box">
-                <div class="summary-title">🤖 AI Summary</div>
-                <div class="summary-text">{analysis["summary"]}</div>
-            </div>
-            ''', unsafe_allow_html=True)
-
-            st.markdown('</div>', unsafe_allow_html=True)
+                # AI Summary
+                st.markdown(f'''
+                <div class="summary-box">
+                    <div class="summary-title">🤖 AI Summary</div>
+                    <div class="summary-text">{analysis["summary"]}</div>
+                </div>
+                ''', unsafe_allow_html=True)
 
         st.markdown("---")
 
