@@ -1,0 +1,16 @@
+# Resume Parser Module Dependencies
+# PDF parsing library for extracting text from PDF files
+pdfplumber>=0.8.0
+
+# AI Analysis Module Dependencies
+# OpenAI library for GPT-based candidate analysis
+openai>=1.0.0
+
+# Google Gemini library (new SDK) for candidate analysis
+google-genai>=0.3.0
+
+# Load API keys and config from .env files
+python-dotenv>=1.0.0
+
+# Optional: For creating sample PDFs in tests (not required for core functionality)
+# fpdf>=1.7.2

@@ -1,0 +1,7 @@
+# Python cache/artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment and secrets
+.env
