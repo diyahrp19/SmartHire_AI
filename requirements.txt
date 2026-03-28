@@ -12,5 +12,11 @@ google-genai>=0.3.0
 # Load API keys and config from .env files
 python-dotenv>=1.0.0
 
+# UI and Data Visualization
+streamlit>=1.28.0
+plotly>=5.0.0
+pandas>=1.0.0
+
 # Optional: For creating sample PDFs in tests (not required for core functionality)
 # fpdf>=1.7.2
+PyPDF2>=3.0.0
