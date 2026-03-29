@@ -6,7 +6,7 @@ from ai_analysis import analyze_candidate
 
 
 class ResumeAnalyzer:
-    def __init__(self, resumes_folder: str = "Resumes", job_description: str = ""):
+    def __init__(self, resumes_folder: str = "data/Resumes", job_description: str = ""):
         self.resumes_folder = resumes_folder
         self.job_description = job_description
         self.candidates_results = []
@@ -255,7 +255,7 @@ def main():
     - Understanding of Agile methodologies
     """
     
-    analyzer = ResumeAnalyzer(resumes_folder="Resumes")
+    analyzer = ResumeAnalyzer(resumes_folder="data/Resumes")
     analyzer.set_job_description(sample_job_description)
     
     print("Job Description:")
@@ -281,7 +281,7 @@ def main():
     else:
         print("\nNo resumes were successfully processed.")
         print("Please ensure:")
-        print("1. The 'Resumes' folder exists")
+        print("1. The 'data/Resumes' folder exists")
         print("2. It contains PDF files")
         print("3. You have set a job description")
         print("4. Required dependencies are installed")

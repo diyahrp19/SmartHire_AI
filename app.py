@@ -116,7 +116,7 @@ def analyze_candidate(job_desc: str, structured: Dict[str, Any]) -> Dict[str, An
 
 
 st.set_page_config(
-    page_title="SmartHire AI – Resume Screening Platform",
+    page_title="SmartHireAI",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="collapsed",

@@ -4,11 +4,11 @@ from analyze_resumes import ResumeAnalyzer
 
 def create_test_resumes_folder():
     """Create a test Resumes folder with sample PDF files."""
-    if not os.path.exists("Resumes"):
-        os.makedirs("Resumes")
-        print("✅ Created 'Resumes' folder")
+    if not os.path.exists("data/Resumes"):
+        os.makedirs("data/Resumes")
+        print("✅ Created 'data/Resumes' folder")
     else:
-        print("✅ 'Resumes' folder already exists")
+        print("✅ 'data/Resumes' folder already exists")
     
     sample_resumes = [
         "John_Doe_Resume.pdf",
@@ -17,14 +17,14 @@ def create_test_resumes_folder():
         "Alice_Johnson_Senior.pdf"
     ]
     
-    print(f"📁 Test resumes that should be in 'Resumes' folder:")
+    print(f"📁 Test resumes that should be in 'data/Resumes' folder:")
     for resume in sample_resumes:
         print(f"   - {resume}")
     
     print(f"\n📝 To test this script:")
-    print(f"   1. Create the 'Resumes' folder")
+    print(f"   1. Create the 'data/Resumes' folder")
     print(f"   2. Add some PDF resume files to it")
-    print(f"   3. Run: python analyze_resumes.py")
+    print(f"   3. Run: python utils/analyze_resumes.py")
     print(f"   4. The script will automatically process all PDFs")
 
 
@@ -51,7 +51,7 @@ def test_resume_analyzer():
     - Agile/Scrum methodology experience
     """
     
-    analyzer = ResumeAnalyzer(resumes_folder="Resumes")
+    analyzer = ResumeAnalyzer(resumes_folder="data/Resumes")
     analyzer.set_job_description(job_description)
     
     print("✅ ResumeAnalyzer initialized successfully")
@@ -66,7 +66,7 @@ def test_resume_analyzer():
         for i, pdf_file in enumerate(pdf_files, 1):
             print(f"   {i}. {os.path.basename(pdf_file)}")
     else:
-        print("❌ No PDF files found. Please add some PDF resumes to the 'Resumes' folder.")
+        print("❌ No PDF files found. Please add some PDF resumes to the 'data/Resumes' folder.")
     
     return analyzer, pdf_files
 
@@ -87,7 +87,7 @@ def demonstrate_expected_output():
     print("-----------------")
     print("We are looking for a skilled Full Stack Developer...")
     print()
-    print("Found 3 resume(s) in 'Resumes' folder:")
+    print("Found 3 resume(s) in 'data/Resumes' folder:")
     print("  1. John_Doe_Resume.pdf")
     print("  2. Jane_Smith_Developer.pdf")
     print("  3. Bob_Wilson_Tech.pdf")
@@ -294,7 +294,7 @@ def main():
     print("✅ Folder structure verified")
     print("✅ Expected output demonstrated")
     print()
-    print("🚀 Ready to use! Run 'python analyze_resumes.py' with actual PDF files")
+    print("🚀 Ready to use! Run 'python utils/analyze_resumes.py' with actual PDF files")
     print("   to see the complete automated resume analysis system in action.")
 
 

@@ -1,4 +1,9 @@
+import os
+import sys
 from unittest.mock import Mock, patch
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
 from app import process_resume_file, get_score_color_class, get_progress_class
 
 
@@ -143,7 +148,7 @@ def main():
         print("🎉 All tests passed!")
         print("✅ Streamlit application is ready to run")
         print("\nTo start the application:")
-        print("1. Install requirements: pip install -r requirements.txt")
+        print("1. Install requirements: pip install -r data/requirements.txt")
         print("2. Set API keys: export OPENAI_API_KEY=your-key")
         print("3. Run: streamlit run app.py")
         print("4. Open browser: http://localhost:8501")

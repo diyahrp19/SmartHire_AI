@@ -31,15 +31,14 @@ An automated resume screening and analysis system that processes PDF resumes, ex
 
 ```
 SmartHire_AI/
-├── resume_parser.py          # PDF text extraction and field parsing
-├── ai_analysis.py            # AI evaluation using LLMs
-├── analyze_resumes.py        # Main script for batch processing
-├── test_analyze_resumes.py   # Test suite and examples
-├── example_usage.py          # Basic usage examples
-├── example_usage_enhanced.py # Enhanced pipeline examples
-├── complete_pipeline_example.py # End-to-end pipeline demonstration
-├── requirements.txt          # Python dependencies
-├── Resumes/                  # Folder for resume PDFs (create this)
+├── utils/resume_parser.py          # PDF text extraction and field parsing
+├── utils/ai_analysis.py            # AI evaluation using LLMs
+├── utils/analyze_resumes.py        # Main script for batch processing
+├── test_utils/analyze_resumes.py   # Test suite and examples
+├── utils/example_usage.py          # Basic usage examples
+├── utils/example_usage_enhanced.py # Enhanced pipeline examples
+├── ├── data/requirements.txt          # Python dependencies
+├── data/Resumes/                  # Folder for resume PDFs (create this)
 └── README.md                # This file
 ```
 
@@ -55,7 +54,7 @@ SmartHire_AI/
 1. **Install Dependencies**
 
    ```bash
-   pip install -r requirements.txt
+   pip install -r config/data/requirements.txt
    ```
 
 2. **Set Up API Keys**
@@ -75,11 +74,11 @@ SmartHire_AI/
 3. **Create Resumes Folder**
 
    ```bash
-   mkdir Resumes
+   mkdir data/Resumes
    ```
 
 4. **Add Resume PDFs**
-   Place your PDF resume files in the `Resumes/` folder.
+   Place your PDF resume files in the `data/Resumes/` folder.
 
 ## 📖 Usage
 
@@ -88,12 +87,12 @@ SmartHire_AI/
 Run the main analysis script:
 
 ```bash
-python analyze_resumes.py
+python services/utils/analyze_resumes.py
 ```
 
 This will:
 
-1. Scan the `Resumes/` folder for PDF files
+1. Scan the `data/Resumes/` folder for PDF files
 2. Process each resume through the complete pipeline
 3. Display detailed results for each candidate
 4. Provide a summary report with rankings
@@ -104,7 +103,7 @@ Launch the modern Streamlit web application:
 
 ```bash
 # Install project requirements
-pip install -r requirements.txt
+pip install -r config/data/requirements.txt
 
 # Set API keys
 export OPENAI_API_KEY="your-openai-api-key"
@@ -129,7 +128,7 @@ Open your browser to `http://localhost:8501` to access the beautiful recruiter d
 SmartHire AI - Resume Analysis System
 ==================================================
 
-Found 3 resume(s) in 'Resumes' folder:
+Found 3 resume(s) in 'data/Resumes' folder:
   1. John_Doe_Resume.pdf
   2. Jane_Smith_Developer.pdf
   3. Bob_Wilson_Tech.pdf
@@ -213,7 +212,7 @@ FINAL RANKING
 
 ### Setting a Custom Job Description
 
-Edit the `main()` function in `analyze_resumes.py`:
+Edit the `main()` function in `utils/analyze_resumes.py`:
 
 ```python
 # Replace with your job description
@@ -226,11 +225,11 @@ Your custom job description here...
 
 ```python
 # For OpenAI (default)
-analyzer = ResumeAnalyzer(resumes_folder="Resumes")
+analyzer = ResumeAnalyzer(resumes_folder="data/Resumes")
 analyzer.set_job_description(job_description)
 
 # For Google Gemini
-analyzer = ResumeAnalyzer(resumes_folder="Resumes")
+analyzer = ResumeAnalyzer(resumes_folder="data/Resumes")
 analyzer.set_job_description(job_description)
 # Set GEMINI_API_KEY environment variable
 ```
@@ -270,7 +269,7 @@ Resumes Folder → Resume Parser → Field Extraction → AI Analysis → Candid
 Run the test suite to verify functionality:
 
 ```bash
-python test_analyze_resumes.py
+python test_utils/analyze_resumes.py
 ```
 
 This will:
@@ -337,7 +336,7 @@ Each candidate analysis includes:
 The system can be integrated into existing HR workflows:
 
 ```python
-from analyze_resumes import ResumeAnalyzer
+from utils.analyze_resumes import ResumeAnalyzer
 
 # Initialize analyzer
 analyzer = ResumeAnalyzer(resumes_folder="path/to/resumes")
@@ -368,7 +367,7 @@ job_descriptions = [
 ]
 
 for job_desc in job_descriptions:
-    analyzer = ResumeAnalyzer(resumes_folder="Resumes")
+    analyzer = ResumeAnalyzer(resumes_folder="data/Resumes")
     analyzer.set_job_description(job_desc)
     results = analyzer.process_all_resumes()
     # Store results for each job description
@@ -403,3 +402,5 @@ For issues and questions:
 ---
 
 **SmartHire AI** - Making resume screening faster, smarter, and more accurate.
+
+
