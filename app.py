@@ -172,26 +172,46 @@ st.markdown("""
 
     .block-container {
         padding-top: 1.2rem !important;
-        padding-bottom: 3rem !important;
-        max-width: 1150px !important;
+        padding-bottom: 2rem !important;
+        max-width: 980px !important;
     }
 
     .hero-shell {
         position: relative;
         overflow: hidden;
-        border-radius: 28px;
-        border: 1px solid transparent;
-        padding: 2.6rem 2.3rem;
-        margin-bottom: 1.5rem;
-        background: linear-gradient(130deg, #f0f9ff 0%, #dbeafe 50%, #e0e7ff 100%);
-        box-shadow: 0 20px 44px rgba(59, 130, 246, 0.18);
+        border-radius: 24px;
+        border: 1px solid rgba(147, 197, 253, 0.5);
+        padding: 1.9rem 1.7rem;
+        margin-bottom: 0.95rem;
+        min-height: 235px;
+        display: flex;
+        align-items: flex-end;
+        background:
+            radial-gradient(640px 280px at 82% 18%, rgba(125, 211, 252, 0.48), transparent 70%),
+            radial-gradient(580px 250px at 18% 82%, rgba(147, 197, 253, 0.38), transparent 70%),
+            linear-gradient(135deg, #eff6ff 0%, #dbeafe 48%, #e0f2fe 100%);
+        box-shadow: 0 20px 44px rgba(37, 99, 235, 0.2);
         transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
         animation: riseIn 0.55s ease-out;
     }
 
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(110deg, rgba(255, 255, 255, 0.4) 0%, rgba(219, 234, 254, 0.28) 48%, rgba(224, 242, 254, 0.22) 100%);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 820px;
+    }
+
     .hero-shell:hover {
         transform: translateY(-4px);
-        border-color: #60a5fa;
+        border-color: #93c5fd;
         box-shadow: 0 24px 52px rgba(37, 99, 235, 0.24);
     }
 
@@ -204,6 +224,7 @@ st.markdown("""
         border-radius: 50%;
         filter: blur(4px);
         animation: floatBlob 7s ease-in-out infinite;
+        z-index: 1;
     }
 
     .hero-shell::before {
@@ -221,38 +242,41 @@ st.markdown("""
     .hero-title {
         position: relative;
         margin: 0;
-        font-size: 2.55rem;
+        font-size: 2.2rem;
         font-weight: 800;
         letter-spacing: -0.03em;
-        color: #1e293b;
+        color: #0f172a;
+        text-shadow: 0 2px 10px rgba(255, 255, 255, 0.45);
     }
 
     .hero-subtitle {
         position: relative;
-        margin: 0.7rem 0 0;
+        margin: 0.5rem 0 0;
         max-width: 760px;
-        color: #334155;
-        line-height: 1.65;
-        font-size: 1.02rem;
+        color: #1e293b;
+        line-height: 1.55;
+        font-size: 0.92rem;
+        text-shadow: 0 1px 6px rgba(255, 255, 255, 0.35);
     }
 
     .hero-pills {
         position: relative;
-        margin-top: 1.2rem;
+        margin-top: 0.8rem;
         display: flex;
         flex-wrap: wrap;
-        gap: 0.6rem;
+        gap: 0.45rem;
     }
 
     .hero-pill {
-        background: rgba(255, 255, 255, 0.78);
+        background: rgba(255, 255, 255, 0.7);
         color: #1d4ed8;
-        border: 1px solid rgba(147, 197, 253, 0.45);
+        border: 1px solid rgba(147, 197, 253, 0.65);
         border-radius: 999px;
-        padding: 0.35rem 0.8rem;
-        font-size: 0.78rem;
+        padding: 0.28rem 0.66rem;
+        font-size: 0.72rem;
         font-weight: 700;
         letter-spacing: 0.02em;
+        backdrop-filter: blur(4px);
     }
 
     .panel-card {
@@ -280,10 +304,10 @@ st.markdown("""
     .st-key-cta_section [data-testid="stVerticalBlockBorderWrapper"] {
         border: 1px solid transparent !important;
         background: linear-gradient(130deg, #f0f9ff 0%, #dbeafe 50%, #e0e7ff 100%) !important;
-        border-radius: 22px !important;
-        margin-bottom: 1.1rem !important;
-        padding: 0.7rem 0.85rem !important;
-        box-shadow: 0 20px 44px rgba(59, 130, 246, 0.18) !important;
+        border-radius: 18px !important;
+        margin-bottom: 0.75rem !important;
+        padding: 0.52rem 0.68rem !important;
+        box-shadow: 0 14px 30px rgba(59, 130, 246, 0.15) !important;
         transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease !important;
     }
 
@@ -649,11 +673,12 @@ st.markdown("""
 
     @media (max-width: 900px) {
         .hero-title {
-            font-size: 2rem;
+            font-size: 1.72rem;
         }
 
         .hero-shell {
-            padding: 2rem 1.25rem;
+            min-height: 210px;
+            padding: 1.4rem 1.1rem;
         }
 
         .kpi-value {
@@ -934,17 +959,88 @@ def process_resume_file(uploaded_file, job_desc: str) -> Dict[str, Any]:
         return {"success": False, "error": str(e), "name": uploaded_file.name}
 
 
+def _candidate_question_section_impl(
+    candidate_key: str,
+    candidate_name: str,
+    score: int,
+    active_job_desc: str,
+    enriched_candidate_data: Dict[str, Any],
+) -> None:
+    if score < INTERVIEW_SCORE_THRESHOLD:
+        return
+
+    st.session_state.candidate_question_status.setdefault(candidate_key, "idle")
+    st.session_state.candidate_questions.setdefault(candidate_key, [])
+
+    status = st.session_state.candidate_question_status.get(candidate_key, "idle")
+    questions = st.session_state.candidate_questions.get(candidate_key, [])
+
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        clicked = st.button(
+            "🤝 Generate Interview Questions",
+            key=f"gen_q_{candidate_key}",
+            width="stretch",
+            disabled=status == "loading",
+        )
+
+    with st.container(key=f"question_panel_{candidate_key}"):
+        if clicked:
+            st.session_state.candidate_question_status[candidate_key] = "loading"
+            with st.spinner("Analyzing resume and generating interview questions..."):
+                generated = generate_interview_questions(active_job_desc, enriched_candidate_data)
+            st.session_state.candidate_questions[candidate_key] = generated
+            st.session_state.candidate_question_status[candidate_key] = "ready"
+            st.session_state[f"question_pick_{candidate_key}"] = -1
+
+            # In fragment scope, rerun only this section to avoid full-page jump.
+            try:
+                st.rerun(scope="fragment")
+            except Exception:
+                pass
+
+        status = st.session_state.candidate_question_status.get(candidate_key, "idle")
+        questions = st.session_state.candidate_questions.get(candidate_key, [])
+
+        with st.container(height=220):
+            st.markdown("**Interview Questions**")
+
+            with st.expander("📋 Suggested Interview Questions", expanded=False):
+                if status == "loading":
+                    st.info("Analyzing resume and generating interview questions...")
+                elif questions:
+                    preview_questions = questions[:2]
+                    st.caption(f"{len(preview_questions)} question(s) generated")
+                    for i, q in enumerate(preview_questions, 1):
+                        question_text = q.get("question", "")
+                        category = q.get("category", "technical").replace("_", " ").title()
+                        difficulty = q.get("difficulty", "medium").title()
+                        st.markdown(f"**{i}. {question_text}**")
+                        st.caption(f"{category} • {difficulty}")
+                else:
+                    st.caption(f"💡 Questions will appear here for {candidate_name}. Click Generate Interview Questions to start.")
+
+
+if hasattr(st, "fragment"):
+    render_candidate_question_section = st.fragment(_candidate_question_section_impl)
+else:
+    render_candidate_question_section = _candidate_question_section_impl
+
+
 def main():
     st.markdown("""
     <div class="hero-shell">
-        <h1 class="hero-title">SmartHire AI</h1>
-        <p class="hero-subtitle">
-            Screen resumes with confidence, rank candidates intelligently, and uncover skill-fit insights in a clean recruiter dashboard.
-        </p>
-        <div class="hero-pills">
-            <span class="hero-pill">Resume Intelligence</span>
-            <span class="hero-pill">Skill Match Scoring</span>
-            <span class="hero-pill">Visual Candidate Ranking</span>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">SmartHire AI</h1>
+            <p class="hero-subtitle">
+                Screen resumes with confidence, rank candidates intelligently, and uncover skill-fit insights in a polished AI recruitment dashboard.
+            </p>
+            <div class="hero-pills">
+                <span class="hero-pill">AI Resume Screening</span>
+                <span class="hero-pill">Hiring Analytics</span>
+                <span class="hero-pill">Recruitment Automation</span>
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -954,7 +1050,7 @@ def main():
         st.markdown('<p class="section-note">Describe the role requirements, skills, and experience expectations.</p>', unsafe_allow_html=True)
         job_desc = st.text_area(
             "Job Description",
-            height=150,
+            height=115,
             placeholder="Example: Hiring a full-stack engineer with React, Node.js, PostgreSQL, AWS, and CI/CD experience. 3+ years preferred.",
             label_visibility="collapsed",
         )
@@ -972,7 +1068,7 @@ def main():
         cta_col_l, cta_col_c, cta_col_r = st.columns([1, 1.3, 1])
         with cta_col_c:
             st.markdown('<div class="cta-wrap">', unsafe_allow_html=True)
-            analyze_btn = st.button("Analyze Candidates", use_container_width=True, type="primary")
+            analyze_btn = st.button("Analyze Candidates", width="stretch", type="primary")
             st.markdown('</div>', unsafe_allow_html=True)
 
     if "analysis_successful" not in st.session_state:
@@ -983,6 +1079,8 @@ def main():
         st.session_state.analysis_job_desc = ""
     if "candidate_questions" not in st.session_state:
         st.session_state.candidate_questions = {}
+    if "candidate_question_status" not in st.session_state:
+        st.session_state.candidate_question_status = {}
     if "analysis_cache" not in st.session_state:
         st.session_state.analysis_cache = {}
 
@@ -1026,8 +1124,18 @@ def main():
             score = analysis["match_score"]
             name = get_candidate_display_name(r)
             email = r["structured_data"].get("email", "N/A")
+            raw_text = str(r.get("structured_data", {}).get("raw_text", ""))
+            raw_text_hash = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()[:16] if raw_text else "no_text"
+            identity_seed = (
+                f"{str(r.get('name', '')).strip().lower()}|"
+                f"{str(name).strip().lower()}|"
+                f"{str(email).strip().lower()}|"
+                f"{raw_text_hash}"
+            )
+            candidate_hash = hashlib.sha256(identity_seed.encode("utf-8")).hexdigest()[:12]
+            candidate_key = f"candidate_{candidate_hash}"
 
-            with st.container(border=True, key=f"candidate_card_{rank}"):
+            with st.container(border=True, key=f"candidate_card_{candidate_hash}"):
                 c1, c2, c3 = st.columns([1, 4, 1])
                 with c1:
                     st.markdown(f'<div class="score-badge {get_score_class(score)}">{score}</div>', unsafe_allow_html=True)
@@ -1074,7 +1182,6 @@ def main():
                 </div>
                 ''', unsafe_allow_html=True)
 
-                candidate_key = f"{name}_{r['name']}_{score}"
                 structured_data = r["structured_data"]
                 enriched_candidate_data = {
                     **structured_data,
@@ -1082,51 +1189,13 @@ def main():
                     "missing_skills": analysis.get("missing_skills", []),
                 }
 
-                col1, col2 = st.columns([3, 1])
-                with col2:
-                    if score >= INTERVIEW_SCORE_THRESHOLD:
-                        if st.button("🤝 Generate Interview Questions", key=f"gen_q_{candidate_key}", use_container_width=True):
-                            with st.spinner(f"Generating personalized questions for {name}..."):
-                                questions = generate_interview_questions(active_job_desc, enriched_candidate_data)
-                                st.session_state.candidate_questions[candidate_key] = questions
-
-                if candidate_key in st.session_state.candidate_questions:
-                    with st.expander(f"📋 Suggested Interview Questions ({len(st.session_state.candidate_questions[candidate_key])} questions)", expanded=True):
-                        questions = st.session_state.candidate_questions[candidate_key]
-
-                        for i, q in enumerate(questions, 1):
-                            question_text = q.get("question", "")
-                            category = q.get("category", "technical").title()
-                            difficulty = q.get("difficulty", "medium").title()
-
-                            category_color = "#1d4ed8"
-                            if category.lower() == "technical":
-                                category_color = "#1d4ed8"
-                            elif category.lower() == "scenario":
-                                category_color = "#0ea5e9"
-                            elif category.lower() == "problem_solving":
-                                category_color = "#16a34a"
-                            elif category.lower() == "job_specific":
-                                category_color = "#eab308"
-
-                            st.markdown(f'''
-                            <div style="margin-bottom: 1.2rem; border-left: 4px solid {category_color}; padding-left: 1rem; background: #f8fbff; border-radius: 8px; padding: 0.8rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                    <span style="background: {category_color}; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
-                                        {category}
-                                    </span>
-                                    <span style="background: #e2e8f0; color: #475569; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
-                                        {difficulty}
-                                    </span>
-                                </div>
-                                <div style="font-size: 0.95rem; line-height: 1.6; color: #1e293b;">
-                                    <strong>{i}. {question_text}</strong>
-                                </div>
-                            </div>
-                            ''', unsafe_allow_html=True)
-
-                elif score >= INTERVIEW_SCORE_THRESHOLD:
-                    st.info(f"💡 Click **Generate Interview Questions** to get personalized questions for {name}")
+                render_candidate_question_section(
+                    candidate_key,
+                    name,
+                    score,
+                    active_job_desc,
+                    enriched_candidate_data,
+                )
 
         st.markdown("---")
 
@@ -1145,7 +1214,7 @@ def main():
                 ''', unsafe_allow_html=True)
                 st.plotly_chart(
                     create_skill_match_distribution(successful),
-                    use_container_width=True,
+                    width="stretch",
                     config=PLOTLY_FULLSCREEN_ONLY_CONFIG,
                 )
 
@@ -1157,72 +1226,77 @@ def main():
             st.error("⚠️ Please upload at least one resume PDF.")
             return
 
-        selected_files = unique_uploaded_files(files)
-        if len(selected_files) < len(files):
-            st.info(f"Using unique files only: {len(selected_files)} file(s) will be analyzed after removing duplicates.")
+        with st.spinner("Analyzing resume and generating interview questions..."):
+            selected_files = unique_uploaded_files(files)
+            if len(selected_files) < len(files):
+                st.info(f"Using unique files only: {len(selected_files)} file(s) will be analyzed after removing duplicates.")
 
-        progress = st.progress(0)
-        status = st.empty()
-        results = []
-        total_files = len(selected_files)
-        processed_count = 0
-        work_items = []
-        cache = st.session_state.analysis_cache
-        jd_hash = hashlib.sha256(job_desc.strip().encode("utf-8")).hexdigest()
+            progress = st.progress(0)
+            status = st.empty()
+            results = []
+            total_files = len(selected_files)
+            processed_count = 0
+            work_items = []
+            cache = st.session_state.analysis_cache
+            jd_hash = hashlib.sha256(job_desc.strip().encode("utf-8")).hexdigest()
 
-        for f in selected_files:
-            file_bytes = f.getvalue()
-            file_hash = hashlib.sha256(file_bytes).hexdigest()
-            cache_key = f"{jd_hash}:{file_hash}"
-            work_items.append({
-                "name": f.name,
-                "bytes": file_bytes,
-                "cache_key": cache_key,
-            })
+            # Show a clear running-state message immediately when analysis starts.
+            status.text("⏳ Analyzing resume and generating interview questions...")
 
-        pending_items = []
-        for item in work_items:
-            cached = cache.get(item["cache_key"])
-            if cached is not None:
-                results.append(cached)
-                processed_count += 1
-                status.text(f"✅ Using cached result {processed_count}/{total_files}: {item['name']}")
-                progress.progress(processed_count / total_files)
-            else:
-                pending_items.append(item)
+            for f in selected_files:
+                file_bytes = f.getvalue()
+                file_hash = hashlib.sha256(file_bytes).hexdigest()
+                cache_key = f"{jd_hash}:{file_hash}"
+                work_items.append({
+                    "name": f.name,
+                    "bytes": file_bytes,
+                    "cache_key": cache_key,
+                })
 
-        if pending_items:
-            max_workers = max(1, min(4, len(pending_items)))
-            with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                future_map = {
-                    executor.submit(_process_resume_bytes, item["name"], item["bytes"], job_desc): item
-                    for item in pending_items
-                }
-
-                for future in as_completed(future_map):
-                    item = future_map[future]
-                    status.text(f"⏳ Processing {processed_count + 1}/{total_files}: {item['name']}")
-                    result = future.result()
-                    cache[item["cache_key"]] = result
-                    results.append(result)
+            pending_items = []
+            for item in work_items:
+                cached = cache.get(item["cache_key"])
+                if cached is not None:
+                    results.append(cached)
                     processed_count += 1
+                    status.text(f"✅ Using cached result {processed_count}/{total_files}: {item['name']}")
                     progress.progress(processed_count / total_files)
+                else:
+                    pending_items.append(item)
 
-        status.empty()
-        progress.empty()
+            if pending_items:
+                max_workers = max(1, min(4, len(pending_items)))
+                with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                    future_map = {
+                        executor.submit(_process_resume_bytes, item["name"], item["bytes"], job_desc): item
+                        for item in pending_items
+                    }
 
-        successful = [r for r in results if r["success"]]
-        failed = [r for r in results if not r["success"]]
+                    for future in as_completed(future_map):
+                        item = future_map[future]
+                        status.text(f"⏳ Processing {processed_count + 1}/{total_files}: {item['name']}")
+                        result = future.result()
+                        cache[item["cache_key"]] = result
+                        results.append(result)
+                        processed_count += 1
+                        progress.progress(processed_count / total_files)
 
-        if not successful:
-            st.error("❌ No resumes were processed successfully. Please check your PDF files.")
-            return
+            status.empty()
+            progress.empty()
 
-        successful.sort(key=lambda x: x["ai_analysis"]["match_score"], reverse=True)
-        st.session_state.analysis_successful = successful
-        st.session_state.analysis_failed = failed
-        st.session_state.analysis_job_desc = job_desc.strip()
-        st.session_state.candidate_questions = {}
+            successful = [r for r in results if r["success"]]
+            failed = [r for r in results if not r["success"]]
+
+            if not successful:
+                st.error("❌ No resumes were processed successfully. Please check your PDF files.")
+                return
+
+            successful.sort(key=lambda x: x["ai_analysis"]["match_score"], reverse=True)
+            st.session_state.analysis_successful = successful
+            st.session_state.analysis_failed = failed
+            st.session_state.analysis_job_desc = job_desc.strip()
+            st.session_state.candidate_questions = {}
+            st.session_state.candidate_question_status = {}
 
     if st.session_state.analysis_successful:
         render_screening_results(
