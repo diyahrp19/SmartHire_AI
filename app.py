@@ -6,7 +6,12 @@ import tempfile
 import json
 import re
 import hashlib
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Any
+
+# Import the new interview question generator
+from utils.interview_question_generator import generate_interview_questions
+INTERVIEW_SCORE_THRESHOLD = 70
 
 try:
     import pdfplumber
@@ -863,31 +868,36 @@ def create_skill_match_distribution(results):
     return fig
 
 
-def process_resume(uploaded_file, job_desc: str) -> Dict[str, Any]:
+def _process_resume_bytes(file_name: str, file_bytes: bytes, job_desc: str) -> Dict[str, Any]:
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            tmp.write(uploaded_file.getvalue())
+            tmp.write(file_bytes)
             tmp_path = tmp.name
 
         raw_text = extract_resume_text(tmp_path)
         if not raw_text.strip():
             os.unlink(tmp_path)
-            return {"success": False, "error": "Could not extract text from PDF. Ensure pdfplumber or PyPDF2 is installed.", "name": uploaded_file.name}
+            return {"success": False, "error": "Could not extract text from PDF. Ensure pdfplumber or PyPDF2 is installed.", "name": file_name}
 
         structured = extract_resume_fields(raw_text)
         analysis = analyze_candidate(job_desc, structured)
+        
         os.unlink(tmp_path)
 
         return {
             "success": True,
             "structured_data": structured,
             "ai_analysis": analysis,
-            "name": uploaded_file.name,
+            "name": file_name,
         }
     except Exception as e:
         try: os.unlink(tmp_path)
         except: pass
-        return {"success": False, "error": str(e), "name": uploaded_file.name}
+        return {"success": False, "error": str(e), "name": file_name}
+
+
+def process_resume(uploaded_file, job_desc: str) -> Dict[str, Any]:
+    return _process_resume_bytes(uploaded_file.name, uploaded_file.getvalue(), job_desc)
 
 
 def process_resume_file(uploaded_file, job_desc: str) -> Dict[str, Any]:
@@ -965,47 +975,25 @@ def main():
             analyze_btn = st.button("Analyze Candidates", use_container_width=True, type="primary")
             st.markdown('</div>', unsafe_allow_html=True)
 
-    if analyze_btn:
-        if not job_desc.strip():
-            st.error("⚠️ Please enter a job description before analyzing.")
-            return
-        if not files:
-            st.error("⚠️ Please upload at least one resume PDF.")
-            return
+    if "analysis_successful" not in st.session_state:
+        st.session_state.analysis_successful = []
+    if "analysis_failed" not in st.session_state:
+        st.session_state.analysis_failed = []
+    if "analysis_job_desc" not in st.session_state:
+        st.session_state.analysis_job_desc = ""
+    if "candidate_questions" not in st.session_state:
+        st.session_state.candidate_questions = {}
+    if "analysis_cache" not in st.session_state:
+        st.session_state.analysis_cache = {}
 
-        selected_files = unique_uploaded_files(files)
-        if len(selected_files) < len(files):
-            st.info(f"Using unique files only: {len(selected_files)} file(s) will be analyzed after removing duplicates.")
-
+    def render_screening_results(successful: List[Dict[str, Any]], failed: List[Dict[str, Any]], active_job_desc: str) -> None:
         st.markdown("---")
         st.markdown('<h2 class="results-heading">Screening Results</h2>', unsafe_allow_html=True)
-
-        progress = st.progress(0)
-        status = st.empty()
-        results = []
-
-        for idx, f in enumerate(selected_files):
-            status.text(f"⏳ Processing {idx+1}/{len(selected_files)}: {f.name}")
-            result = process_resume(f, job_desc)
-            results.append(result)
-            progress.progress((idx + 1) / len(selected_files))
-
-        status.empty()
-        progress.empty()
-
-        successful = [r for r in results if r["success"]]
-        failed = [r for r in results if not r["success"]]
 
         if failed:
             with st.expander(f"⚠️ {len(failed)} file(s) could not be processed", expanded=False):
                 for r in failed:
                     st.warning(f"**{r['name']}**: {r['error']}")
-
-        if not successful:
-            st.error("❌ No resumes were processed successfully. Please check your PDF files.")
-            return
-
-        successful.sort(key=lambda x: x["ai_analysis"]["match_score"], reverse=True)
 
         st.markdown('<p class="section-title">Summary</p>', unsafe_allow_html=True)
 
@@ -1086,6 +1074,60 @@ def main():
                 </div>
                 ''', unsafe_allow_html=True)
 
+                candidate_key = f"{name}_{r['name']}_{score}"
+                structured_data = r["structured_data"]
+                enriched_candidate_data = {
+                    **structured_data,
+                    "matched_skills": analysis.get("matched_skills", []),
+                    "missing_skills": analysis.get("missing_skills", []),
+                }
+
+                col1, col2 = st.columns([3, 1])
+                with col2:
+                    if score >= INTERVIEW_SCORE_THRESHOLD:
+                        if st.button("🤝 Generate Interview Questions", key=f"gen_q_{candidate_key}", use_container_width=True):
+                            with st.spinner(f"Generating personalized questions for {name}..."):
+                                questions = generate_interview_questions(active_job_desc, enriched_candidate_data)
+                                st.session_state.candidate_questions[candidate_key] = questions
+
+                if candidate_key in st.session_state.candidate_questions:
+                    with st.expander(f"📋 Suggested Interview Questions ({len(st.session_state.candidate_questions[candidate_key])} questions)", expanded=True):
+                        questions = st.session_state.candidate_questions[candidate_key]
+
+                        for i, q in enumerate(questions, 1):
+                            question_text = q.get("question", "")
+                            category = q.get("category", "technical").title()
+                            difficulty = q.get("difficulty", "medium").title()
+
+                            category_color = "#1d4ed8"
+                            if category.lower() == "technical":
+                                category_color = "#1d4ed8"
+                            elif category.lower() == "scenario":
+                                category_color = "#0ea5e9"
+                            elif category.lower() == "problem_solving":
+                                category_color = "#16a34a"
+                            elif category.lower() == "job_specific":
+                                category_color = "#eab308"
+
+                            st.markdown(f'''
+                            <div style="margin-bottom: 1.2rem; border-left: 4px solid {category_color}; padding-left: 1rem; background: #f8fbff; border-radius: 8px; padding: 0.8rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="background: {category_color}; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
+                                        {category}
+                                    </span>
+                                    <span style="background: #e2e8f0; color: #475569; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
+                                        {difficulty}
+                                    </span>
+                                </div>
+                                <div style="font-size: 0.95rem; line-height: 1.6; color: #1e293b;">
+                                    <strong>{i}. {question_text}</strong>
+                                </div>
+                            </div>
+                            ''', unsafe_allow_html=True)
+
+                elif score >= INTERVIEW_SCORE_THRESHOLD:
+                    st.info(f"💡 Click **Generate Interview Questions** to get personalized questions for {name}")
+
         st.markdown("---")
 
         st.markdown('<p class="section-title">Data Visualization</p>', unsafe_allow_html=True)
@@ -1106,6 +1148,88 @@ def main():
                     use_container_width=True,
                     config=PLOTLY_FULLSCREEN_ONLY_CONFIG,
                 )
+
+    if analyze_btn:
+        if not job_desc.strip():
+            st.error("⚠️ Please enter a job description before analyzing.")
+            return
+        if not files:
+            st.error("⚠️ Please upload at least one resume PDF.")
+            return
+
+        selected_files = unique_uploaded_files(files)
+        if len(selected_files) < len(files):
+            st.info(f"Using unique files only: {len(selected_files)} file(s) will be analyzed after removing duplicates.")
+
+        progress = st.progress(0)
+        status = st.empty()
+        results = []
+        total_files = len(selected_files)
+        processed_count = 0
+        work_items = []
+        cache = st.session_state.analysis_cache
+        jd_hash = hashlib.sha256(job_desc.strip().encode("utf-8")).hexdigest()
+
+        for f in selected_files:
+            file_bytes = f.getvalue()
+            file_hash = hashlib.sha256(file_bytes).hexdigest()
+            cache_key = f"{jd_hash}:{file_hash}"
+            work_items.append({
+                "name": f.name,
+                "bytes": file_bytes,
+                "cache_key": cache_key,
+            })
+
+        pending_items = []
+        for item in work_items:
+            cached = cache.get(item["cache_key"])
+            if cached is not None:
+                results.append(cached)
+                processed_count += 1
+                status.text(f"✅ Using cached result {processed_count}/{total_files}: {item['name']}")
+                progress.progress(processed_count / total_files)
+            else:
+                pending_items.append(item)
+
+        if pending_items:
+            max_workers = max(1, min(4, len(pending_items)))
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                future_map = {
+                    executor.submit(_process_resume_bytes, item["name"], item["bytes"], job_desc): item
+                    for item in pending_items
+                }
+
+                for future in as_completed(future_map):
+                    item = future_map[future]
+                    status.text(f"⏳ Processing {processed_count + 1}/{total_files}: {item['name']}")
+                    result = future.result()
+                    cache[item["cache_key"]] = result
+                    results.append(result)
+                    processed_count += 1
+                    progress.progress(processed_count / total_files)
+
+        status.empty()
+        progress.empty()
+
+        successful = [r for r in results if r["success"]]
+        failed = [r for r in results if not r["success"]]
+
+        if not successful:
+            st.error("❌ No resumes were processed successfully. Please check your PDF files.")
+            return
+
+        successful.sort(key=lambda x: x["ai_analysis"]["match_score"], reverse=True)
+        st.session_state.analysis_successful = successful
+        st.session_state.analysis_failed = failed
+        st.session_state.analysis_job_desc = job_desc.strip()
+        st.session_state.candidate_questions = {}
+
+    if st.session_state.analysis_successful:
+        render_screening_results(
+            st.session_state.analysis_successful,
+            st.session_state.analysis_failed,
+            st.session_state.analysis_job_desc,
+        )
 
 
 if __name__ == "__main__":
