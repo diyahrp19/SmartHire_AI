@@ -31,15 +31,18 @@ An automated resume screening and analysis system that processes PDF resumes, ex
 
 ```
 SmartHire_AI/
+├── app.py                          # Streamlit app entrypoint
+├── Procfile                        # Start command for PaaS platforms
+├── requirements.txt                # Python dependencies
+├── render.yaml                     # Render Blueprint deployment config
 ├── utils/resume_parser.py          # PDF text extraction and field parsing
 ├── utils/ai_analysis.py            # AI evaluation using LLMs
 ├── utils/analyze_resumes.py        # Main script for batch processing
-├── test_utils/analyze_resumes.py   # Test suite and examples
+├── utils/test_analyze_resumes.py   # Test suite
 ├── utils/example_usage.py          # Basic usage examples
 ├── utils/example_usage_enhanced.py # Enhanced pipeline examples
-├── ├── data/requirements.txt          # Python dependencies
 ├── data/Resumes/                  # Folder for resume PDFs (create this)
-└── README.md                # This file
+└── README.md                       # This file
 ```
 
 ## 🛠️ Installation
@@ -54,7 +57,7 @@ SmartHire_AI/
 1. **Install Dependencies**
 
    ```bash
-   pip install -r config/data/requirements.txt
+   pip install -r requirements.txt
    ```
 
 2. **Set Up API Keys**
@@ -87,7 +90,7 @@ SmartHire_AI/
 Run the main analysis script:
 
 ```bash
-python services/utils/analyze_resumes.py
+python utils/analyze_resumes.py
 ```
 
 This will:
@@ -103,7 +106,7 @@ Launch the modern Streamlit web application:
 
 ```bash
 # Install project requirements
-pip install -r config/data/requirements.txt
+pip install -r requirements.txt
 
 # Set API keys
 export OPENAI_API_KEY="your-openai-api-key"
@@ -111,6 +114,33 @@ export OPENAI_API_KEY="your-openai-api-key"
 # Run the web app
 streamlit run app.py
 ```
+
+## 🌐 Deploy On Render
+
+This project is ready for Render Web Service deployment.
+
+### Option 1: Blueprint (recommended)
+
+1. Push this repository to GitHub.
+2. In Render, click **New +** → **Blueprint**.
+3. Select your repository.
+4. Render will auto-detect `render.yaml` and create the service.
+5. Add environment variables in Render:
+   - `OPENAI_API_KEY` (optional)
+   - `GEMINI_API_KEY` (optional)
+   - `SMARTHIRE_USE_AI_QUESTIONS` (`false` by default)
+
+### Option 2: Manual Web Service
+
+Use these values while creating a Python Web Service:
+
+- Build Command: `pip install -r requirements.txt`
+- Start Command: `streamlit run app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true`
+
+### Notes
+
+- `Procfile` and `render.yaml` are both included for compatibility.
+- Uploaded files are processed from memory and temporary files only, so no persistent disk is required.
 
 Open your browser to `http://localhost:8501` to access the beautiful recruiter dashboard.
 
@@ -402,5 +432,3 @@ For issues and questions:
 ---
 
 **SmartHire AI** - Making resume screening faster, smarter, and more accurate.
-
-
