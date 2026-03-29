@@ -241,15 +241,34 @@ Generate 2-3 highly personalized interview questions for this candidate based on
 
         candidate_skills = self.normalize_skills(candidate_data.get("skills", []) or [])
         matched_skills = self.normalize_skills(candidate_data.get("matched_skills", []) or [])
+        missing_skills = self.normalize_skills(candidate_data.get("missing_skills", []) or [])
         job_skills = self._extract_required_skills(job_description)
 
-        focus_skills = matched_skills or [s for s in candidate_skills if s in set(job_skills)] or candidate_skills
-        focus_skills = focus_skills[:2]
+        job_skill_set = {s.lower() for s in job_skills}
+        primary_focus = (matched_skills[:1] or [s for s in candidate_skills if s.lower() in job_skill_set][:1] or candidate_skills[:1])
+        secondary_focus = [s for s in candidate_skills if s.lower() not in {x.lower() for x in primary_focus}][:1]
 
-        for skill in focus_skills:
+        for skill in primary_focus:
             questions.append({
-                "question": f"In one project, how did you use {skill} to solve a real production problem?",
+                "question": f"Describe one production challenge where you used {skill} and explain your design trade-offs.",
                 "category": "technical",
+                "difficulty": "medium",
+            })
+
+        for skill in secondary_focus:
+            if len(questions) >= self.max_questions:
+                break
+            questions.append({
+                "question": f"You list {skill} in your profile. What was the highest-impact outcome you delivered with it?",
+                "category": "scenario",
+                "difficulty": "medium",
+            })
+
+        if len(questions) < self.max_questions and missing_skills:
+            gap = missing_skills[0]
+            questions.append({
+                "question": f"{gap} is important for this role. How would you ramp up and contribute with it in your first 90 days?",
+                "category": "job_specific",
                 "difficulty": "medium",
             })
 

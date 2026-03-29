@@ -1185,6 +1185,7 @@ def main():
                 structured_data = r["structured_data"]
                 enriched_candidate_data = {
                     **structured_data,
+                    "name": name,
                     "matched_skills": analysis.get("matched_skills", []),
                     "missing_skills": analysis.get("missing_skills", []),
                 }
