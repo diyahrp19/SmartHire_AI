@@ -102,6 +102,18 @@ def analyze_candidate(job_desc: str, structured: Dict[str, Any]) -> Dict[str, An
     extra = [s for s in candidate_skills if s.lower() not in [r.lower() for r in required]]
     score = min(100, score + len(extra) * 2)
 
+    strengths = []
+    if required:
+        strengths.append(f"{len(matched)}/{len(required)} required skills matched")
+    if extra:
+        strengths.append(f"Additional relevant skills: {', '.join(extra[:4])}")
+    if score >= 80:
+        strengths.append("High overall alignment for the role")
+    elif score >= 60:
+        strengths.append("Moderate alignment with clear growth potential")
+    else:
+        strengths.append("Candidate may be suitable for junior-track or trainable roles")
+
     # Generate summary
     if score >= 80:
         summary = f"Excellent match with {len(matched)} key skills aligned. Strong candidate recommended for interview. Additional strengths in {', '.join(extra[:3]) if extra else 'relevant areas'}."
@@ -115,6 +127,7 @@ def analyze_candidate(job_desc: str, structured: Dict[str, Any]) -> Dict[str, An
         "matched_skills": matched,
         "missing_skills": missing,
         "extra_skills": extra,
+        "strengths": strengths,
         "summary": summary,
     }
 
@@ -594,6 +607,19 @@ st.markdown("""
     .skill-matched { background: #dbeafe; color: #1e3a8a; border: 1px solid #93c5fd; }
     .skill-missing { background: #e0e7ff; color: #3730a3; border: 1px solid #a5b4fc; }
     .skill-extra { background: #e0f2fe; color: #0c4a6e; border: 1px solid #7dd3fc; }
+    .skill-none { background: #f1f5f9; color: #475569; border: 1px dashed #cbd5e1; }
+
+    .strength-list {
+        margin: 0.35rem 0 0.1rem 1.1rem;
+        padding: 0;
+    }
+
+    .strength-item {
+        margin-bottom: 0.28rem;
+        color: var(--ink-700);
+        font-size: 0.84rem;
+        line-height: 1.5;
+    }
 
     .summary-box {
         margin-top: 0.85rem;
@@ -1013,20 +1039,29 @@ def main():
                 ''', unsafe_allow_html=True)
 
                 # Skills
+                st.markdown("**Matched Skills:**")
                 if analysis["matched_skills"]:
-                    st.markdown("**Matched Skills:**")
                     skills_html = " ".join([f'<span class="skill-badge skill-matched">{s}</span>' for s in analysis["matched_skills"]])
-                    st.markdown(skills_html, unsafe_allow_html=True)
+                else:
+                    skills_html = '<span class="skill-badge skill-none">None identified</span>'
+                st.markdown(skills_html, unsafe_allow_html=True)
 
+                st.markdown("**Missing Skills:**")
                 if analysis["missing_skills"]:
-                    st.markdown("**Missing Skills:**")
                     skills_html = " ".join([f'<span class="skill-badge skill-missing">{s}</span>' for s in analysis["missing_skills"]])
-                    st.markdown(skills_html, unsafe_allow_html=True)
+                else:
+                    skills_html = '<span class="skill-badge skill-none">No critical gaps</span>'
+                st.markdown(skills_html, unsafe_allow_html=True)
 
                 if analysis.get("extra_skills"):
                     st.markdown("**Extra Skills:**")
                     skills_html = " ".join([f'<span class="skill-badge skill-extra">{s}</span>' for s in analysis["extra_skills"]])
                     st.markdown(skills_html, unsafe_allow_html=True)
+
+                if analysis.get("strengths"):
+                    st.markdown("**Strengths:**")
+                    strengths_html = "".join([f'<li class="strength-item">{s}</li>' for s in analysis["strengths"]])
+                    st.markdown(f'<ul class="strength-list">{strengths_html}</ul>', unsafe_allow_html=True)
 
                 # AI Summary
                 st.markdown(f'''
