@@ -13,6 +13,7 @@ import os
 import tempfile
 import json
 import re
+import hashlib
 from typing import List, Dict, Any
 
 # ─── PDF text extraction (pure Python, no external binary) ───────────────────
@@ -268,45 +269,55 @@ st.markdown("""
         animation: riseIn 0.5s ease-out;
     }
 
+    /* Remove Streamlit's default dark border color on bordered containers */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        border: 1px solid var(--line) !important;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(241, 247, 255, 0.9)) !important;
+        border-color: transparent !important;
+    }
+
+    /* Input area cards via stable keyed containers */
+    .st-key-job_section,
+    .st-key-upload_section,
+    .st-key-cta_section,
+    .st-key-job_section [data-testid="stVerticalBlockBorderWrapper"],
+    .st-key-upload_section [data-testid="stVerticalBlockBorderWrapper"],
+    .st-key-cta_section [data-testid="stVerticalBlockBorderWrapper"] {
+        border: 1px solid transparent !important;
+        background: linear-gradient(130deg, #f0f9ff 0%, #dbeafe 50%, #e0e7ff 100%) !important;
         border-radius: 22px !important;
-        padding: 0.7rem 0.85rem !important;
         margin-bottom: 1.1rem !important;
-        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12) !important;
+        padding: 0.7rem 0.85rem !important;
+        box-shadow: 0 20px 44px rgba(59, 130, 246, 0.18) !important;
+        transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease !important;
     }
 
-    [data-testid="stVerticalBlockBorderWrapper"]:has(.section-title) {
-        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    .st-key-job_section:hover,
+    .st-key-upload_section:hover,
+    .st-key-cta_section:hover,
+    .st-key-job_section [data-testid="stVerticalBlockBorderWrapper"]:hover,
+    .st-key-upload_section [data-testid="stVerticalBlockBorderWrapper"]:hover,
+    .st-key-cta_section [data-testid="stVerticalBlockBorderWrapper"]:hover {
+        transform: translateY(-4px);
+        border-color: #60a5fa !important;
+        box-shadow: 0 24px 52px rgba(37, 99, 235, 0.24) !important;
     }
 
-    [data-testid="stVerticalBlockBorderWrapper"]:has(.section-title):hover {
-        transform: translateY(-3px);
-        border-color: #93c5fd !important;
-        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.18) !important;
-    }
-
-    [data-testid="stVerticalBlockBorderWrapper"]:has(.cta-wrap) {
-        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-    }
-
-    [data-testid="stVerticalBlockBorderWrapper"]:has(.cta-wrap):hover {
-        transform: translateY(-3px);
-        border-color: #93c5fd !important;
-        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.18) !important;
-    }
-
-    [data-testid="stVerticalBlockBorderWrapper"]:has(.candidate-name) {
+    /* Candidate result cards remain separately styled */
+    [class^="st-key-candidate_card_"],
+    [class*=" st-key-candidate_card_"],
+    [class^="st-key-candidate_card_"] [data-testid="stVerticalBlockBorderWrapper"],
+    [class*=" st-key-candidate_card_"] [data-testid="stVerticalBlockBorderWrapper"] {
         border: 1px solid var(--line) !important;
         background: linear-gradient(180deg, #f8fbff, #edf4ff) !important;
         border-radius: 20px !important;
         padding: 0.8rem 0.9rem !important;
         box-shadow: 0 12px 25px rgba(37, 99, 235, 0.12) !important;
-        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease !important;
     }
 
-    [data-testid="stVerticalBlockBorderWrapper"]:has(.candidate-name):hover {
+    [class^="st-key-candidate_card_"]:hover,
+    [class*=" st-key-candidate_card_"]:hover,
+    [class^="st-key-candidate_card_"] [data-testid="stVerticalBlockBorderWrapper"]:hover,
+    [class*=" st-key-candidate_card_"] [data-testid="stVerticalBlockBorderWrapper"]:hover {
         transform: translateY(-3px);
         border-color: #93c5fd !important;
         box-shadow: 0 16px 30px rgba(37, 99, 235, 0.18) !important;
@@ -335,6 +346,64 @@ st.markdown("""
         margin: 0.38rem 0 0.85rem;
         color: var(--ink-500);
         font-size: 0.87rem;
+    }
+
+    .viz-card-title {
+        margin: 0;
+        color: var(--ink-900);
+        font-size: 1.02rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+
+    .viz-card-note {
+        margin: 0.35rem 0 0.8rem;
+        color: var(--ink-500);
+        font-size: 0.82rem;
+    }
+
+    .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 0.2rem 0 0.65rem;
+    }
+
+    .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.8rem;
+        color: var(--ink-700);
+        font-weight: 600;
+    }
+
+    .legend-dot {
+        width: 6px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .legend-high { background: #16a34a; }
+    .legend-medium { background: #eab308; }
+    .legend-low { background: #dc2626; }
+
+    .st-key-viz_distribution_card,
+    .st-key-viz_distribution_card [data-testid="stVerticalBlockBorderWrapper"] {
+        border: 1px solid #bfdbfe !important;
+        border-radius: 18px !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 247, 255, 0.96)) !important;
+        padding: 1rem 1rem 0.8rem !important;
+        box-shadow: 0 12px 26px rgba(37, 99, 235, 0.12) !important;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease !important;
+    }
+
+    .st-key-viz_distribution_card:hover,
+    .st-key-viz_distribution_card [data-testid="stVerticalBlockBorderWrapper"]:hover {
+        transform: translateY(-2px);
+        border-color: #93c5fd !important;
+        box-shadow: 0 16px 30px rgba(37, 99, 235, 0.16) !important;
     }
 
     .stTextArea textarea {
@@ -581,10 +650,45 @@ st.markdown("""
             font-size: 1.65rem;
         }
     }
+            
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<style>
+/* Overrides for job desc, upload, analyze cards - no black borders, theme blue */
+[data-testid="stVerticalBlockBorderWrapper"]:has(.section-title),
+[data-testid="stVerticalBlockBorderWrapper"]:has(.cta-wrap) {
+    border: none !important;
+    background: linear-gradient(135deg, #f8fbff 0%, #e0f2fe 100%) !important;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.15) !important;
+    border-radius: 22px !important;
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.section-title):hover,
+[data-testid="stVerticalBlockBorderWrapper"]:has(.cta-wrap):hover {
+    border: 1px solid var(--brand-soft) !important;
+    transform: translateY(-6px) !important;
+    box-shadow: 0 25px 50px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Main layout wrapper */
+.stLayoutWrapper,
+[class*="st-emotion-cache-"] [role="main"] {
+    border: none !important;
+    background: transparent !important;
+}
+
+.stLayoutWrapper:hover {
+    box-shadow: inset 0 2px 10px rgba(37, 99, 235, 0.08) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
+
+
 
 def get_rank_badge(rank: int) -> str:
     badges = {1: "🥇", 2: "🥈", 3: "🥉"}
@@ -602,6 +706,36 @@ def get_score_color(score: int) -> str:
     if score >= 80: return "#1d4ed8"
     if score >= 60: return "#3b82f6"
     return "#93c5fd"
+
+
+def get_candidate_display_name(result: Dict[str, Any]) -> str:
+    structured = result.get("structured_data", {}) or {}
+    parsed_name = str(structured.get("name", "")).strip()
+    if parsed_name and parsed_name.lower() not in {"unknown", "unknown candidate", "n/a"}:
+        return parsed_name
+
+    file_name = str(result.get("name", "")).strip()
+    if file_name.lower().endswith(".pdf"):
+        file_name = os.path.splitext(file_name)[0]
+    return file_name or "Candidate"
+
+
+def unique_uploaded_files(files) -> List[Any]:
+    """Remove duplicates by file content hash (same PDF selected multiple times)."""
+    unique_by_hash: Dict[str, Any] = {}
+    for uploaded_file in files or []:
+        file_bytes = uploaded_file.getvalue()
+        digest = hashlib.sha256(file_bytes).hexdigest()
+        unique_by_hash[digest] = uploaded_file
+    return list(unique_by_hash.values())
+
+PLOTLY_FULLSCREEN_ONLY_CONFIG = {
+    "displaylogo": False,
+    "displayModeBar": False,
+    "scrollZoom": False,
+    "doubleClick": False,
+    "staticPlot": True,
+}
 
 
 # ─── Charts ──────────────────────────────────────────────────────────────────
@@ -643,6 +777,72 @@ def create_skill_chart(results):
         font=dict(family="Plus Jakarta Sans", size=12),
         margin=dict(l=100, t=60),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    return fig
+
+def create_skill_match_distribution(results):
+    ranked = sorted(
+        results,
+        key=lambda r: r["ai_analysis"].get("match_score", 0),
+        reverse=True,
+    )
+
+    raw_names = [get_candidate_display_name(r) for r in ranked]
+
+    display_names = []
+    for raw_name in raw_names:
+        name = re.sub(r"\s+", " ", str(raw_name or "")).strip()
+        if not name:
+            name = "Unknown"
+
+        # Keep axis labels neat and readable.
+        name = name.title()
+        name_parts = name.split()
+        if len(name_parts) > 2:
+            name = " ".join(name_parts[:2])
+        if len(name) > 16:
+            name = name[:16] + "..."
+        if " " in name:
+            first, second = name.split(" ", 1)
+            name = f"{first}<br>{second}"
+        display_names.append(name)
+
+    scores = [int(max(0, min(100, r["ai_analysis"].get("match_score", 0)))) for r in ranked]
+
+    colors = []
+    for score in scores:
+        if score >= 80:
+            colors.append("#16a34a")  # high
+        elif score >= 60:
+            colors.append("#eab308")  # medium
+        else:
+            colors.append("#dc2626")  # low
+
+    bar_width = 0.16 if len(display_names) <= 2 else 0.2
+
+    fig = go.Figure(
+        go.Bar(
+            x=display_names,
+            y=scores,
+            width=[bar_width] * len(display_names),
+            marker=dict(color=colors, line=dict(color="rgba(15, 23, 42, 0.18)", width=1), cornerradius=6),
+            text=[f"{score}" for score in scores],
+            textposition="outside",
+            customdata=raw_names,
+            hovertemplate="%{customdata}<br>Match Score: %{y}<extra></extra>",
+        )
+    )
+    fig.update_layout(
+        xaxis=dict(title="Candidate", fixedrange=True, tickangle=0, automargin=True),
+        yaxis=dict(title="Match Score", range=[0, 100], fixedrange=True),
+        bargap=0.55,
+        dragmode=False,
+        hovermode="closest",
+        height=max(360, 220 + (len(display_names) * 22)),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Plus Jakarta Sans", size=12),
+        margin=dict(t=20, b=90, l=24, r=24),
     )
     return fig
 
@@ -693,7 +893,7 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    with st.container(border=True):
+    with st.container(border=True, key="job_section"):
         st.markdown('<p class="section-title">Job Description</p>', unsafe_allow_html=True)
         st.markdown('<p class="section-note">Describe the role requirements, skills, and experience expectations.</p>', unsafe_allow_html=True)
         job_desc = st.text_area(
@@ -703,16 +903,16 @@ def main():
             label_visibility="collapsed",
         )
 
-    with st.container(border=True):
+    with st.container(border=True, key="upload_section"):
         st.markdown('<p class="section-title">Upload Resume PDFs</p>', unsafe_allow_html=True)
         st.markdown('<p class="section-note">Drop one or more PDF files to evaluate candidates against your role.</p>', unsafe_allow_html=True)
         files = st.file_uploader("Resume Files", type=["pdf"], accept_multiple_files=True, label_visibility="collapsed")
-
         if files:
-            selected_tags = "".join([f'<span class="selected-file">PDF {f.name}</span>' for f in files])
-            st.markdown(selected_tags, unsafe_allow_html=True)
+            unique_count = len(unique_uploaded_files(files))
+            if unique_count < len(files):
+                st.caption(f"Duplicate PDFs detected. {len(files) - unique_count} duplicate file(s) will be removed automatically.")
 
-    with st.container(border=True):
+    with st.container(border=True, key="cta_section"):
         cta_col_l, cta_col_c, cta_col_r = st.columns([1, 1.3, 1])
         with cta_col_c:
             st.markdown('<div class="cta-wrap">', unsafe_allow_html=True)
@@ -727,6 +927,10 @@ def main():
             st.error("⚠️ Please upload at least one resume PDF.")
             return
 
+        selected_files = unique_uploaded_files(files)
+        if len(selected_files) < len(files):
+            st.info(f"Using unique files only: {len(selected_files)} file(s) will be analyzed after removing duplicates.")
+
         st.markdown("---")
         st.markdown('<h2 class="results-heading">Screening Results</h2>', unsafe_allow_html=True)
 
@@ -734,11 +938,11 @@ def main():
         status = st.empty()
         results = []
 
-        for idx, f in enumerate(files):
-            status.text(f"⏳ Processing {idx+1}/{len(files)}: {f.name}")
+        for idx, f in enumerate(selected_files):
+            status.text(f"⏳ Processing {idx+1}/{len(selected_files)}: {f.name}")
             result = process_resume(f, job_desc)
             results.append(result)
-            progress.progress((idx + 1) / len(files))
+            progress.progress((idx + 1) / len(selected_files))
 
         status.empty()
         progress.empty()
@@ -788,10 +992,10 @@ def main():
             rank = idx + 1
             analysis = r["ai_analysis"]
             score = analysis["match_score"]
-            name = r["structured_data"].get("name", "Unknown")
+            name = get_candidate_display_name(r)
             email = r["structured_data"].get("email", "N/A")
 
-            with st.container(border=True):
+            with st.container(border=True, key=f"candidate_card_{rank}"):
                 c1, c2, c3 = st.columns([1, 4, 1])
                 with c1:
                     st.markdown(f'<div class="score-badge {get_score_class(score)}">{score}</div>', unsafe_allow_html=True)
@@ -836,12 +1040,23 @@ def main():
 
         # ── Data Visualization ──
         st.markdown('<p class="section-title">Data Visualization</p>', unsafe_allow_html=True)
-
-        ch1, ch2 = st.columns(2)
-        with ch1:
-            st.plotly_chart(create_score_chart(successful), use_container_width=True)
-        with ch2:
-            st.plotly_chart(create_skill_chart(successful), use_container_width=True)
+        left_col, center_col, right_col = st.columns([1, 2, 1])
+        with center_col:
+            with st.container(border=True, key="viz_distribution_card"):
+                st.markdown('<p class="viz-card-title">Candidate Score Comparison</p>', unsafe_allow_html=True)
+                st.markdown('<p class="viz-card-note">Vertical comparison of all candidates sorted by score from highest to lowest.</p>', unsafe_allow_html=True)
+                st.markdown('''
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="legend-dot legend-high"></span>High (80-100)</span>
+                    <span class="legend-item"><span class="legend-dot legend-medium"></span>Medium (60-79)</span>
+                    <span class="legend-item"><span class="legend-dot legend-low"></span>Low (0-59)</span>
+                </div>
+                ''', unsafe_allow_html=True)
+                st.plotly_chart(
+                    create_skill_match_distribution(successful),
+                    use_container_width=True,
+                    config=PLOTLY_FULLSCREEN_ONLY_CONFIG,
+                )
 
 
 if __name__ == "__main__":
