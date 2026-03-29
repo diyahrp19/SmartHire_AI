@@ -1,11 +1,3 @@
-"""
-Resume Parser Module for Resume Screening AI Project
-
-This module provides functionality to extract text content from uploaded resume files
-in PDF format. The extracted text can then be analyzed by an AI model for various
-purposes such as skill extraction, candidate analysis, and job description matching.
-"""
-
 import os
 import re
 from typing import Optional, Dict, List
@@ -13,36 +5,18 @@ import pdfplumber
 
 
 def extract_resume_text(file_path: str) -> Optional[str]:
-    """
-    Extract text content from a PDF resume file.
-    
-    Args:
-        file_path (str): Path to the PDF file to be processed
-        
-    Returns:
-        Optional[str]: Cleaned text content from the resume, or None if extraction fails
-        
-    Raises:
-        FileNotFoundError: If the file does not exist
-        ValueError: If the file is not a PDF
-    """
-    # Validate file path
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
     
-    # Validate file extension
     if not file_path.lower().endswith('.pdf'):
         raise ValueError(f"Unsupported file format. Please provide a PDF file: {file_path}")
     
     try:
-        # Open the PDF file using pdfplumber
         with pdfplumber.open(file_path) as pdf:
             extracted_text = []
             
-            # Extract text from all pages
             for page_num, page in enumerate(pdf.pages, 1):
                 try:
-                    # Extract text from current page
                     page_text = page.extract_text()
                     
                     if page_text:
@@ -52,10 +26,8 @@ def extract_resume_text(file_path: str) -> Optional[str]:
                     print(f"Warning: Could not extract text from page {page_num}: {page_error}")
                     continue
             
-            # Combine all page text into a single string
             full_text = '\n'.join(extracted_text)
             
-            # Clean the extracted text
             cleaned_text = clean_resume_text(full_text)
             
             return cleaned_text if cleaned_text else None
@@ -66,47 +38,24 @@ def extract_resume_text(file_path: str) -> Optional[str]:
 
 
 def clean_resume_text(text: str) -> str:
-    """
-    Clean and normalize extracted resume text.
-    
-    Args:
-        text (str): Raw text extracted from PDF
-        
-    Returns:
-        str: Cleaned and normalized text suitable for AI analysis
-    """
     if not text:
         return ""
     
-    # Remove excessive whitespace and normalize line breaks
-    cleaned = re.sub(r'\n\s*\n', '\n\n', text)  # Replace multiple newlines with double newlines
-    cleaned = re.sub(r'[ \t]+', ' ', cleaned)   # Replace multiple spaces/tabs with single space
+    cleaned = re.sub(r'\n\s*\n', '\n\n', text)
+    cleaned = re.sub(r'[ \t]+', ' ', cleaned)
     
-    # Remove leading/trailing whitespace from each line
     cleaned = '\n'.join(line.strip() for line in cleaned.split('\n'))
     
-    # Remove excessive consecutive empty lines (more than 2)
     cleaned = re.sub(r'\n\n\n+', '\n\n', cleaned)
     
-    # Remove any non-printable characters except standard whitespace
     cleaned = re.sub(r'[^\x20-\x7E\n\r\t]', '', cleaned)
     
-    # Strip leading and trailing whitespace from the entire text
     cleaned = cleaned.strip()
     
     return cleaned
 
 
 def validate_pdf_file(file_path: str) -> bool:
-    """
-    Validate if a file is a readable PDF.
-    
-    Args:
-        file_path (str): Path to the file to validate
-        
-    Returns:
-        bool: True if the file is a valid PDF, False otherwise
-    """
     try:
         if not os.path.exists(file_path):
             return False
@@ -114,9 +63,7 @@ def validate_pdf_file(file_path: str) -> bool:
         if not file_path.lower().endswith('.pdf'):
             return False
         
-        # Try to open the PDF to verify it's valid
         with pdfplumber.open(file_path) as pdf:
-            # Check if we can access basic properties
             _ = len(pdf.pages)
             
         return True
@@ -126,15 +73,6 @@ def validate_pdf_file(file_path: str) -> bool:
 
 
 def extract_resume_fields(resume_text: str) -> Dict[str, Optional[str]]:
-    """
-    Extract structured information from cleaned resume text.
-    
-    Args:
-        resume_text (str): Cleaned resume text from extract_resume_text()
-        
-    Returns:
-        Dict[str, Optional[str]]: Dictionary containing extracted resume fields
-    """
     if not resume_text:
         return {
             "name": None,
@@ -146,20 +84,17 @@ def extract_resume_fields(resume_text: str) -> Dict[str, Optional[str]]:
             "experience": None
         }
     
-    # Convert to lowercase for case-insensitive matching
     text_lower = resume_text.lower()
     
-    # Extract email using regex
     email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     emails = re.findall(email_pattern, resume_text)
     email = emails[0] if emails else None
     
-    # Extract phone number using regex (Indian format and international)
     phone_patterns = [
-        r'\+91[-\s]?\d{5}[-\s]?\d{5}',  # Indian format: +91 98765 43210 or +91-98765-43210
-        r'\+?\d{1,3}[-\s]?\d{10}',      # International format
-        r'\b\d{3}[-.\s]??\d{3}[-.\s]??\d{4}\b',  # US format variations
-        r'\b\d{10}\b'                   # Simple 10-digit number
+        r'\+91[-\s]?\d{5}[-\s]?\d{5}',
+        r'\+?\d{1,3}[-\s]?\d{10}',
+        r'\b\d{3}[-.\s]??\d{3}[-.\s]??\d{4}\b',
+        r'\b\d{10}\b'
     ]
     
     phone = None
@@ -169,19 +104,10 @@ def extract_resume_fields(resume_text: str) -> Dict[str, Optional[str]]:
             phone = phones[0]
             break
     
-    # Extract name (usually at the beginning, first 2-3 capitalized words)
     name = extract_name(resume_text)
-    
-    # Extract role/job title
     role = extract_role(text_lower)
-    
-    # Extract skills
     skills = extract_skills(text_lower)
-    
-    # Extract education
     education = extract_education(text_lower)
-    
-    # Extract experience
     experience = extract_experience(text_lower)
     
     return {
@@ -196,46 +122,23 @@ def extract_resume_fields(resume_text: str) -> Dict[str, Optional[str]]:
 
 
 def extract_name(resume_text: str) -> Optional[str]:
-    """
-    Extract name from resume text (usually appears at the beginning).
-    
-    Args:
-        resume_text (str): Cleaned resume text
-        
-    Returns:
-        Optional[str]: Extracted name or None
-    """
     lines = resume_text.split('\n')
     
-    # Look for name in first few lines
     for i, line in enumerate(lines[:5]):
-        # Skip empty lines and common headers
         if not line.strip() or any(keyword in line.lower() for keyword in 
                                    ['email', 'phone', 'address', 'linkedin', 'github']):
             continue
             
-        # Look for lines with 2-4 capitalized words (likely a name)
         words = line.strip().split()
         if 2 <= len(words) <= 4:
-            # Check if most words are capitalized (indicating a name)
             capitalized_words = sum(1 for word in words if word and word[0].isupper())
-            if capitalized_words >= len(words) * 0.7:  # At least 70% of words should be capitalized
+            if capitalized_words >= len(words) * 0.7:
                 return line.strip()
     
     return None
 
 
 def extract_role(text_lower: str) -> Optional[str]:
-    """
-    Extract job role/title from resume text.
-    
-    Args:
-        text_lower (str): Lowercase resume text
-        
-    Returns:
-        Optional[str]: Extracted role or None
-    """
-    # Look for common job titles in the text
     common_titles = [
         'software engineer', 'software developer', 'frontend developer', 'backend developer',
         'full stack developer', 'data scientist', 'data analyst', 'machine learning engineer',
@@ -248,7 +151,6 @@ def extract_role(text_lower: str) -> Optional[str]:
         if title in text_lower:
             return title.title()
     
-    # Look for role indicators followed by text
     role_patterns = [
         r'summary\s*:?\s*([a-zA-Z\s]+)',
         r'objective\s*:?\s*([a-zA-Z\s]+)',
@@ -269,15 +171,6 @@ def extract_role(text_lower: str) -> Optional[str]:
 
 
 def extract_skills(text_lower: str) -> List[str]:
-    """
-    Extract skills from resume text.
-    
-    Args:
-        text_lower (str): Lowercase resume text
-        
-    Returns:
-        List[str]: List of extracted skills
-    """
     skill_aliases = {
         "JavaScript": ["javascript", " js "],
         "TypeScript": ["typescript", " ts "],
@@ -329,32 +222,19 @@ def extract_skills(text_lower: str) -> List[str]:
 
 
 def extract_education(text_lower: str) -> Optional[str]:
-    """
-    Extract education information from resume text.
-    
-    Args:
-        text_lower (str): Lowercase resume text
-        
-    Returns:
-        Optional[str]: Extracted education information or None
-    """
-    # Look for education section
     education_keywords = ['education', 'academic background', 'qualifications']
     
     for keyword in education_keywords:
         if keyword in text_lower:
-            # Find the education section
             pattern = rf'{keyword}.*?(?=\n\n|\n[A-Z][a-z]+\s*:|\Z)'
             matches = re.findall(pattern, text_lower, re.DOTALL)
             if matches:
                 education_text = matches[0].strip()
-                # Extract degree information
                 degree_pattern = r'(b\.?tech|b\.?sc|b\.?com|b\.?a|m\.?tech|m\.?sc|m\.?com|m\.?a|ph\.?d|mba|ms|bs)'
                 degrees = re.findall(degree_pattern, education_text, re.IGNORECASE)
                 if degrees:
                     return f"{degrees[0].upper()} in {extract_degree_major(education_text)}"
     
-    # Look for degree patterns in the entire text
     degree_patterns = [
         r'(b\.?tech|b\.?sc|b\.?com|b\.?a|m\.?tech|m\.?sc|m\.?com|m\.?a|ph\.?d|mba|ms|bs)',
         r'(bachelor|master|phd|mba)\s+(of\s+)?(science|technology|arts|commerce|engineering)',
@@ -367,12 +247,10 @@ def extract_education(text_lower: str) -> Optional[str]:
             degree = matches[0][0] if isinstance(matches[0], tuple) else matches[0]
             return f"{degree.upper()} in {extract_degree_major(text_lower)}"
     
-    # Look for specific degree mentions in education section
     education_section_pattern = r'education.*?(?=\n\n|\Z)'
     education_matches = re.findall(education_section_pattern, text_lower, re.DOTALL | re.IGNORECASE)
     if education_matches:
         education_text = education_matches[0]
-        # Look for specific degree patterns in education section
         specific_degree_patterns = [
             r'bachelor.*?technology.*?computer.*?science',
             r'b\.?tech.*?computer.*?science',
@@ -386,16 +264,6 @@ def extract_education(text_lower: str) -> Optional[str]:
 
 
 def extract_degree_major(text_lower: str) -> str:
-    """
-    Extract the major/field of study from education text.
-    
-    Args:
-        text_lower (str): Lowercase text to search
-        
-    Returns:
-        str: Extracted major or "Computer Science" as default
-    """
-    # Common majors
     majors = [
         'computer science', 'information technology', 'software engineering', 'electrical engineering',
         'mechanical engineering', 'civil engineering', 'chemical engineering', 'data science',
@@ -410,33 +278,20 @@ def extract_degree_major(text_lower: str) -> str:
 
 
 def extract_experience(text_lower: str) -> Optional[str]:
-    """
-    Extract experience information from resume text.
-    
-    Args:
-        text_lower (str): Lowercase resume text
-        
-    Returns:
-        Optional[str]: Extracted experience information or None
-    """
-    # Look for experience section
     experience_keywords = ['experience', 'work experience', 'professional experience', 'employment history']
     
     for keyword in experience_keywords:
         if keyword in text_lower:
-            # Find the experience section
             pattern = rf'{keyword}.*?(?=\n\n|\n[A-Z][a-z]+\s*:|\Z)'
             matches = re.findall(pattern, text_lower, re.DOTALL)
             if matches:
                 experience_text = matches[0].strip()
-                # Extract years of experience
                 year_pattern = r'(\d+)\s*(years?|yrs?)\s*(of\s*)?(experience|exp)'
                 year_matches = re.findall(year_pattern, experience_text, re.IGNORECASE)
                 if year_matches:
                     years = year_matches[0][0]
                     return f"{years}+ years of experience"
     
-    # Look for experience patterns in the entire text
     exp_patterns = [
         r'(\d+)\s*(years?|yrs?)\s*(of\s*)?(experience|exp)',
         r'experience\s*:\s*(\d+)\s*years?',
@@ -454,8 +309,6 @@ def extract_experience(text_lower: str) -> Optional[str]:
 
 
 if __name__ == "__main__":
-    # Example usage
-    # This section can be used for testing the module
     import sys
     
     if len(sys.argv) > 1:

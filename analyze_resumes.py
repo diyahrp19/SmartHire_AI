@@ -1,10 +1,3 @@
-"""
-Resume Analysis Script for SmartHire AI
-
-This script automatically processes all PDF resumes from the "Resumes" folder,
-extracts structured information, and generates AI evaluation results for each candidate.
-"""
-
 import os
 import glob
 from typing import List, Dict, Any
@@ -13,36 +6,19 @@ from ai_analysis import analyze_candidate
 
 
 class ResumeAnalyzer:
-    """Main class for analyzing resumes from a folder."""
-    
     def __init__(self, resumes_folder: str = "Resumes", job_description: str = ""):
-        """
-        Initialize the resume analyzer.
-        
-        Args:
-            resumes_folder (str): Path to the folder containing resume PDFs
-            job_description (str): Job description for candidate evaluation
-        """
         self.resumes_folder = resumes_folder
         self.job_description = job_description
         self.candidates_results = []
     
     def set_job_description(self, job_description: str):
-        """Set the job description for analysis."""
         self.job_description = job_description
     
     def find_resume_files(self) -> List[str]:
-        """
-        Find all PDF files in the resumes folder.
-        
-        Returns:
-            List[str]: List of PDF file paths
-        """
         if not os.path.exists(self.resumes_folder):
             print(f"Error: Folder '{self.resumes_folder}' not found.")
             return []
         
-        # Find all PDF files in the folder
         pdf_pattern = os.path.join(self.resumes_folder, "*.pdf")
         pdf_files = glob.glob(pdf_pattern)
         
@@ -57,21 +33,11 @@ class ResumeAnalyzer:
         return pdf_files
     
     def process_single_resume(self, pdf_file_path: str) -> Dict[str, Any]:
-        """
-        Process a single resume file through the complete pipeline.
-        
-        Args:
-            pdf_file_path (str): Path to the PDF resume file
-            
-        Returns:
-            Dict[str, Any]: Complete analysis results for the candidate
-        """
         candidate_name = os.path.splitext(os.path.basename(pdf_file_path))[0]
         print(f"\nProcessing resume: {candidate_name}")
         print("-" * 50)
         
         try:
-            # Step 1: Extract text from PDF
             print("Step 1: Extracting text from PDF...")
             raw_text = extract_resume_text(pdf_file_path)
             
@@ -88,7 +54,6 @@ class ResumeAnalyzer:
             
             print(f"✅ Successfully extracted {len(raw_text)} characters")
             
-            # Step 2: Extract structured fields
             print("Step 2: Extracting structured fields...")
             structured_data = extract_resume_fields(raw_text)
             
@@ -105,13 +70,11 @@ class ResumeAnalyzer:
             
             print(f"✅ Successfully extracted structured data")
             
-            # Step 3: AI analysis
             print("Step 3: Performing AI analysis...")
             ai_analysis = analyze_candidate(self.job_description, structured_data)
             
             print(f"✅ AI analysis completed")
             
-            # Combine all results
             result = {
                 "name": candidate_name,
                 "success": True,
@@ -135,17 +98,10 @@ class ResumeAnalyzer:
             }
     
     def process_all_resumes(self) -> List[Dict[str, Any]]:
-        """
-        Process all resumes in the folder.
-        
-        Returns:
-            List[Dict[str, Any]]: List of analysis results for all candidates
-        """
         if not self.job_description:
             print("Error: Job description not set. Please set a job description first.")
             return []
         
-        # Find all resume files
         pdf_files = self.find_resume_files()
         
         if not pdf_files:
@@ -154,7 +110,6 @@ class ResumeAnalyzer:
         print(f"\nStarting analysis of {len(pdf_files)} resume(s)...")
         print("=" * 60)
         
-        # Process each resume
         results = []
         successful_count = 0
         
@@ -174,12 +129,6 @@ class ResumeAnalyzer:
         return results
     
     def display_candidate_results(self, result: Dict[str, Any]):
-        """
-        Display the analysis results for a single candidate.
-        
-        Args:
-            result (Dict[str, Any]): Analysis result for a candidate
-        """
         if not result["success"]:
             print(f"❌ {result['name']}: {result['error']}")
             return
@@ -209,7 +158,6 @@ class ResumeAnalyzer:
         print(ai_analysis['summary'])
     
     def display_all_results(self):
-        """Display results for all processed candidates."""
         if not self.candidates_results:
             print("No results to display. Please process resumes first.")
             return
@@ -218,7 +166,6 @@ class ResumeAnalyzer:
         print(f"ALL CANDIDATE RESULTS")
         print(f"{'='*80}")
         
-        # Sort by match score (descending)
         successful_results = [r for r in self.candidates_results if r["success"]]
         successful_results.sort(
             key=lambda x: (
@@ -229,11 +176,9 @@ class ResumeAnalyzer:
             reverse=True,
         )
         
-        # Display successful results first
         for result in successful_results:
             self.display_candidate_results(result)
         
-        # Display failed results
         failed_results = [r for r in self.candidates_results if not r["success"]]
         if failed_results:
             print(f"\n{'='*80}")
@@ -243,12 +188,6 @@ class ResumeAnalyzer:
                 print(f"❌ {result['name']}: {result['error']}")
     
     def get_ranked_candidates(self) -> List[Dict[str, Any]]:
-        """
-        Get candidates ranked by match score.
-        
-        Returns:
-            List[Dict[str, Any]]: Ranked list of successful candidates
-        """
         successful_results = [r for r in self.candidates_results if r["success"]]
         ranked_results = sorted(
             successful_results,
@@ -262,7 +201,6 @@ class ResumeAnalyzer:
         return ranked_results
     
     def print_summary_report(self):
-        """Print a summary report of all candidates."""
         if not self.candidates_results:
             print("No results to summarize. Please process resumes first.")
             return
@@ -297,11 +235,9 @@ class ResumeAnalyzer:
 
 
 def main():
-    """Main function to demonstrate the resume analysis functionality."""
     print("SmartHire AI - Resume Analysis System")
     print("=" * 50)
     
-    # Sample job description (can be customized)
     sample_job_description = """
     We are looking for a skilled Full Stack Developer with experience in modern web technologies.
     
@@ -319,7 +255,6 @@ def main():
     - Understanding of Agile methodologies
     """
     
-    # Initialize analyzer
     analyzer = ResumeAnalyzer(resumes_folder="Resumes")
     analyzer.set_job_description(sample_job_description)
     
@@ -327,17 +262,13 @@ def main():
     print("-" * 17)
     print(sample_job_description[:150] + "...")
     
-    # Process all resumes
     results = analyzer.process_all_resumes()
     
     if results:
-        # Display detailed results
         analyzer.display_all_results()
         
-        # Print summary report
         analyzer.print_summary_report()
         
-        # Get ranked candidates
         ranked_candidates = analyzer.get_ranked_candidates()
         if ranked_candidates:
             print(f"\n{'='*60}")

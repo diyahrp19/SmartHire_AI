@@ -1,10 +1,3 @@
-"""
-Example usage of the resume_parser.py module
-
-This script demonstrates how to use the resume parser in a real-world scenario
-for a Resume Screening AI project.
-"""
-
 from resume_parser import extract_resume_text, clean_resume_text, validate_pdf_file
 
 
@@ -14,18 +7,14 @@ def main():
     print("Resume Parser Example Usage")
     print("=" * 30)
     
-    # Example 1: Basic usage
     print("\n1. Basic Usage Example:")
     print("-" * 20)
     
-    # Note: This would normally be a real PDF file path
     sample_resume_path = "sample_resume.pdf"
     
-    # Check if file exists and is valid
     if validate_pdf_file(sample_resume_path):
         print(f"✓ Valid PDF file: {sample_resume_path}")
         
-        # Extract text from the resume
         resume_text = extract_resume_text(sample_resume_path)
         
         if resume_text:
@@ -40,7 +29,6 @@ def main():
         print(f"✗ Invalid or missing PDF file: {sample_resume_path}")
         print("Note: In a real scenario, this would be an uploaded resume file")
     
-    # Example 2: Text cleaning demonstration
     print("\n2. Text Cleaning Example:")
     print("-" * 20)
     
@@ -70,7 +58,6 @@ def main():
     
     print(f"\nText cleaning reduced size from {len(dirty_resume_text)} to {len(cleaned_text)} characters")
     
-    # Example 3: Integration with AI analysis (conceptual)
     print("\n3. Integration with AI Analysis:")
     print("-" * 30)
     
@@ -80,12 +67,8 @@ def main():
     print("• Job description matching")
     print("• Resume scoring and ranking")
     
-    # Example of how you might send this to an AI model
     if cleaned_text:
         print(f"\nExample: Sending {len(cleaned_text)} characters of resume data to AI model...")
-        # In a real implementation, this would be:
-        # ai_response = ai_model.analyze_resume(cleaned_text)
-        # print(f"AI Analysis Result: {ai_response}")
 
 
 def process_uploaded_resume(file_path: str):
@@ -106,19 +89,16 @@ def process_uploaded_resume(file_path: str):
     }
     
     try:
-        # Validate the uploaded file
         if not validate_pdf_file(file_path):
             result['error'] = "Invalid PDF file or file not found"
             return result
         
-        # Extract text from the resume
         extracted_text = extract_resume_text(file_path)
         
         if not extracted_text:
             result['error'] = "Could not extract text from the resume"
             return result
         
-        # Calculate some basic metadata
         word_count = len(extracted_text.split())
         char_count = len(extracted_text)
         

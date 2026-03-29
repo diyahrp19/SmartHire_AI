@@ -1,10 +1,3 @@
-"""
-Test script for resume_parser.py module
-
-This script tests the resume parser functionality with sample data
-and demonstrates how to use the module.
-"""
-
 import os
 import tempfile
 from resume_parser import extract_resume_text, clean_resume_text, validate_pdf_file, extract_resume_fields
@@ -15,7 +8,6 @@ def create_sample_pdf():
     try:
         from fpdf import FPDF
         
-        # Create a simple PDF with sample resume content
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -50,12 +42,10 @@ def create_sample_pdf():
         Graduated: May 2018
         """
         
-        # Write content to PDF
         for line in sample_content.split('\n'):
             if line.strip():
                 pdf.cell(0, 10, txt=line.strip(), ln=True)
         
-        # Save to temporary file
         temp_file = tempfile.NamedTemporaryFile(suffix='.pdf', delete=False)
         pdf.output(temp_file.name)
         return temp_file.name
@@ -70,7 +60,6 @@ def test_resume_parser():
     print("Testing Resume Parser Module")
     print("=" * 40)
     
-    # Test 1: Test with a sample PDF (if fpdf is available)
     sample_pdf_path = create_sample_pdf()
     
     if sample_pdf_path:
@@ -87,7 +76,6 @@ def test_resume_parser():
         except Exception as e:
             print(f"✗ Error during PDF extraction: {e}")
         finally:
-            # Clean up temporary file
             if os.path.exists(sample_pdf_path):
                 os.unlink(sample_pdf_path)
     else:
@@ -95,7 +83,6 @@ def test_resume_parser():
     
     print()
     
-    # Test 2: Test text cleaning functionality
     print("Test 2: Testing text cleaning functionality")
     dirty_text = """
     John Doe
@@ -116,7 +103,6 @@ def test_resume_parser():
     print("Cleaned text:")
     print(repr(cleaned_text))
     
-    # Verify cleaning worked
     if '\n\n\n' not in cleaned_text and '  ' not in cleaned_text.strip():
         print("✓ Text cleaning successful")
     else:
@@ -124,29 +110,23 @@ def test_resume_parser():
     
     print()
     
-    # Test 3: Test file validation
     print("Test 3: Testing file validation")
     
-    # Test with non-existent file
     result = validate_pdf_file("nonexistent.pdf")
     print(f"Non-existent file validation: {result} (should be False)")
     
-    # Test with invalid extension
     result = validate_pdf_file("test.txt")
     print(f"Invalid extension validation: {result} (should be False)")
     
-    # Test with sample PDF if available
     if sample_pdf_path and os.path.exists(sample_pdf_path):
         result = validate_pdf_file(sample_pdf_path)
         print(f"Valid PDF validation: {result} (should be True)")
     
     print()
     
-    # Test 4: Test structured field extraction
     print("Test 4: Testing structured field extraction")
     print("-" * 40)
     
-    # Sample cleaned resume text for testing
     sample_resume_text = """
     John Smith
     Senior Software Developer
@@ -178,10 +158,8 @@ def test_resume_parser():
     Graduated: June 2018
     """
     
-    # Clean the sample text
     cleaned_sample = clean_resume_text(sample_resume_text)
     
-    # Extract structured fields
     extracted_fields = extract_resume_fields(cleaned_sample)
     
     print("Extracted Fields:")
@@ -192,35 +170,29 @@ def test_resume_parser():
         else:
             print(f"{key}: {value}")
     
-    # Verify extraction results
     print("\nVerification:")
     print("-" * 12)
     
-    # Check name extraction
     if extracted_fields.get("name") and "John Smith" in extracted_fields["name"]:
         print("✓ Name extraction successful")
     else:
         print("✗ Name extraction failed")
     
-    # Check email extraction
     if extracted_fields.get("email") == "john.smith@techcompany.com":
         print("✓ Email extraction successful")
     else:
         print("✗ Email extraction failed")
     
-    # Check phone extraction
     if extracted_fields.get("phone") and "+91" in extracted_fields["phone"]:
         print("✓ Phone extraction successful")
     else:
         print("✗ Phone extraction failed")
     
-    # Check role extraction
     if extracted_fields.get("role") and "software" in extracted_fields["role"].lower():
         print("✓ Role extraction successful")
     else:
         print("✗ Role extraction failed")
     
-    # Check skills extraction
     skills = extracted_fields.get("skills", [])
     expected_skills = ["Python", "JavaScript", "Django", "React"]
     found_skills = [skill for skill in skills if skill in expected_skills]
@@ -229,14 +201,12 @@ def test_resume_parser():
     else:
         print("✗ Skills extraction failed")
     
-    # Check education extraction
     education = extracted_fields.get("education")
     if education and ("b.tech" in education.lower() or "bachelor" in education.lower() or "bsc" in education.lower() or "ba" in education.lower()):
         print("✓ Education extraction successful")
     else:
         print("✗ Education extraction failed")
     
-    # Check experience extraction
     if extracted_fields.get("experience") and "5" in extracted_fields["experience"]:
         print("✓ Experience extraction successful")
     else:

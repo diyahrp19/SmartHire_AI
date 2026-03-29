@@ -1,25 +1,15 @@
-"""
-Test script for the analyze_resumes.py functionality.
-
-This script creates sample resume files and tests the automated resume analysis system.
-"""
-
 import os
-import tempfile
 from analyze_resumes import ResumeAnalyzer
 
 
 def create_test_resumes_folder():
     """Create a test Resumes folder with sample PDF files."""
-    # Create Resumes folder if it doesn't exist
     if not os.path.exists("Resumes"):
         os.makedirs("Resumes")
         print("✅ Created 'Resumes' folder")
     else:
         print("✅ 'Resumes' folder already exists")
     
-    # Note: In a real scenario, these would be actual PDF files
-    # For testing purposes, we'll create some placeholder files
     sample_resumes = [
         "John_Doe_Resume.pdf",
         "Jane_Smith_Developer.pdf", 
@@ -29,7 +19,6 @@ def create_test_resumes_folder():
     
     print(f"📁 Test resumes that should be in 'Resumes' folder:")
     for resume in sample_resumes:
-        resume_path = os.path.join("Resumes", resume)
         print(f"   - {resume}")
     
     print(f"\n📝 To test this script:")
@@ -45,7 +34,6 @@ def test_resume_analyzer():
     print("TESTING RESUME ANALYZER CLASS")
     print("="*60)
     
-    # Create a sample job description
     job_description = """
     We are seeking an experienced Full Stack Developer with expertise in modern web technologies.
     
@@ -63,7 +51,6 @@ def test_resume_analyzer():
     - Agile/Scrum methodology experience
     """
     
-    # Initialize analyzer
     analyzer = ResumeAnalyzer(resumes_folder="Resumes")
     analyzer.set_job_description(job_description)
     
@@ -71,7 +58,6 @@ def test_resume_analyzer():
     print(f"📁 Target folder: {analyzer.resumes_folder}")
     print(f"📄 Job description set: {len(job_description)} characters")
     
-    # Test finding resume files
     print(f"\n🔍 Searching for resume files...")
     pdf_files = analyzer.find_resume_files()
     
@@ -295,13 +281,10 @@ def main():
     print("Resume Analysis System - Test Suite")
     print("=" * 40)
     
-    # Create test folder structure
     create_test_resumes_folder()
     
-    # Test the analyzer class
-    analyzer, pdf_files = test_resume_analyzer()
+    test_resume_analyzer()
     
-    # Show expected output
     demonstrate_expected_output()
     
     print("\n" + "="*60)

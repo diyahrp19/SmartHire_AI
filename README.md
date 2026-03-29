@@ -5,6 +5,7 @@ An automated resume screening and analysis system that processes PDF resumes, ex
 ## 🚀 Features
 
 ### Core Functionality
+
 - **PDF Resume Processing**: Automatically extracts text from PDF resumes
 - **Structured Data Extraction**: Converts resume text into structured fields (name, skills, experience, education, etc.)
 - **AI-Powered Evaluation**: Uses Large Language Models (LLMs) to evaluate candidates against job descriptions
@@ -12,6 +13,7 @@ An automated resume screening and analysis system that processes PDF resumes, ex
 - **Candidate Ranking**: Ranks candidates by match score for easy comparison
 
 ### Web Interface
+
 - **Modern Streamlit UI**: Beautiful, professional web interface for recruiters
 - **Drag & Drop Upload**: Easy file upload with visual feedback
 - **Real-time Processing**: Live progress indicators and results
@@ -19,6 +21,7 @@ An automated resume screening and analysis system that processes PDF resumes, ex
 - **Responsive Design**: Works on desktop and tablet devices
 
 ### Technical Features
+
 - **Multiple LLM Providers**: Support for OpenAI (GPT) and Google Gemini
 - **Error Handling**: Graceful handling of parsing errors and missing data
 - **Modular Architecture**: Clean separation of concerns for easy maintenance
@@ -43,29 +46,34 @@ SmartHire_AI/
 ## 🛠️ Installation
 
 ### Prerequisites
+
 - Python 3.8 or higher
 - PDF resume files to analyze
 
 ### Setup
 
 1. **Install Dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 2. **Set Up API Keys**
-   
+
    For OpenAI:
+
    ```bash
    export OPENAI_API_KEY="your-openai-api-key"
    ```
-   
+
    For Google Gemini:
+
    ```bash
    export GEMINI_API_KEY="your-gemini-api-key"
    ```
 
 3. **Create Resumes Folder**
+
    ```bash
    mkdir Resumes
    ```
@@ -78,11 +86,13 @@ SmartHire_AI/
 ### Option 1: Command Line Interface
 
 Run the main analysis script:
+
 ```bash
 python analyze_resumes.py
 ```
 
 This will:
+
 1. Scan the `Resumes/` folder for PDF files
 2. Process each resume through the complete pipeline
 3. Display detailed results for each candidate
@@ -91,9 +101,10 @@ This will:
 ### Option 2: Web Interface (Recommended)
 
 Launch the modern Streamlit web application:
+
 ```bash
-# Install Streamlit requirements
-pip install -r streamlit_requirements.txt
+# Install project requirements
+pip install -r requirements.txt
 
 # Set API keys
 export OPENAI_API_KEY="your-openai-api-key"
@@ -105,13 +116,12 @@ streamlit run app.py
 Open your browser to `http://localhost:8501` to access the beautiful recruiter dashboard.
 
 #### Web Interface Features:
+
 - **Drag & Drop Upload**: Upload multiple PDF resumes easily
 - **Real-time Processing**: Watch as resumes are analyzed in real-time
 - **Interactive Results**: Beautiful candidate cards with match visualization
 - **Professional Dashboard**: Clean, modern interface designed for recruiters
 - **Detailed Analytics**: Comprehensive match scores and skill analysis
-
-For detailed web interface documentation, see [STREAMLIT_GUIDE.md](STREAMLIT_GUIDE.md).
 
 ### Example Output
 
@@ -264,6 +274,7 @@ python test_analyze_resumes.py
 ```
 
 This will:
+
 - Test the ResumeAnalyzer class
 - Demonstrate expected output format
 - Verify folder structure
@@ -271,16 +282,19 @@ This will:
 ## 📋 Requirements
 
 ### Core Dependencies
+
 - `pdfplumber>=0.8.0` - PDF text extraction
 - `openai>=1.0.0` - OpenAI API integration
 - `google-generativeai>=0.3.0` - Google Gemini API integration
 
 ### Optional Dependencies
+
 - `fpdf>=1.7.2` - For creating sample PDFs in tests
 
 ## 🔑 API Keys
 
 ### OpenAI Setup
+
 1. Get an API key from [OpenAI Platform](https://platform.openai.com/api-keys)
 2. Set environment variable:
    ```bash
@@ -288,6 +302,7 @@ This will:
    ```
 
 ### Google Gemini Setup
+
 1. Get an API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Set environment variable:
    ```bash
@@ -348,7 +363,7 @@ For high-volume recruitment:
 # Process multiple job descriptions
 job_descriptions = [
     "Senior Developer",
-    "Frontend Developer", 
+    "Frontend Developer",
     "Backend Developer"
 ]
 
@@ -374,6 +389,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 For issues and questions:
+
 1. Check the [Issues](../../issues) section
 2. Review the documentation
 3. Create a new issue with detailed information

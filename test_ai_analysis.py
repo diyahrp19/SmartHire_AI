@@ -1,13 +1,4 @@
-"""
-Test script for the AI Analysis Module
-
-This script tests the AI-powered candidate evaluation functionality
-with sample data and demonstrates how to use the module.
-"""
-
-import os
-import sys
-from ai_analysis import analyze_candidate, CandidateAnalyzer, CandidateAnalysis
+from ai_analysis import analyze_candidate
 
 
 def test_ai_analysis_module():
@@ -15,7 +6,6 @@ def test_ai_analysis_module():
     print("Testing AI Analysis Module")
     print("=" * 30)
     
-    # Test 1: Test with sample job description and candidate
     print("\nTest 1: Single Candidate Analysis")
     print("-" * 35)
     
@@ -55,11 +45,9 @@ def test_ai_analysis_module():
     print(f"Skills: {', '.join(candidate_data['skills'])}")
     print(f"Experience: {candidate_data['experience']}")
     
-    # Test with mock (since we don't have real API keys in test)
     print("\nNote: This test demonstrates the expected output format.")
     print("For actual AI analysis, set OPENAI_API_KEY or GEMINI_API_KEY environment variable.")
     
-    # Show expected output structure
     expected_output = {
         "match_score": 87,
         "matched_skills": ["JavaScript", "React", "Node.js", "MongoDB", "AWS", "Docker", "TypeScript"],
@@ -76,7 +64,6 @@ def test_ai_analysis_module():
         else:
             print(f"{key}: {value}")
     
-    # Test 2: Test with missing skills
     print("\n\nTest 2: Candidate with Missing Skills")
     print("-" * 35)
     
@@ -111,23 +98,19 @@ def test_ai_analysis_module():
         else:
             print(f"{key}: {value}")
     
-    # Test 3: Test error handling
     print("\n\nTest 3: Error Handling")
     print("-" * 20)
     
-    # Test with missing job description
     result_empty_job = analyze_candidate("", candidate_data)
     print("Empty job description result:")
     print(f"Match Score: {result_empty_job['match_score']}")
     print(f"Summary: {result_empty_job['summary']}")
     
-    # Test with missing candidate data
     result_empty_candidate = analyze_candidate(job_description, {})
     print("\nEmpty candidate data result:")
     print(f"Match Score: {result_empty_candidate['match_score']}")
     print(f"Summary: {result_empty_candidate['summary']}")
     
-    # Test 4: Test multiple candidates
     print("\n\nTest 4: Multiple Candidate Analysis")
     print("-" * 35)
     
@@ -164,7 +147,6 @@ def test_ai_analysis_module():
     print("2. Carol Brown (good backend experience)")
     print("3. Bob Wilson (lowest score - junior level)")
     
-    # Test 5: Test different providers
     print("\n\nTest 5: Provider Configuration")
     print("-" * 30)
     
@@ -205,21 +187,16 @@ def demonstrate_integration():
     print("-" * 25)
     
     integration_code = '''
-    # Complete pipeline example
     from resume_parser import extract_resume_text, extract_resume_fields
     from ai_analysis import analyze_candidate
     
-    # Step 1: Process resume
     raw_text = extract_resume_text("resume.pdf")
     candidate_data = extract_resume_fields(raw_text)
     
-    # Step 2: Get job description
     job_description = get_job_description_from_recruiter()
     
-    # Step 3: AI analysis
     analysis = analyze_candidate(job_description, candidate_data)
     
-    # Step 4: Use results
     print(f"Candidate Match Score: {analysis['match_score']}/100")
     print(f"Matched Skills: {', '.join(analysis['matched_skills'])}")
     print(f"Summary: {analysis['summary']}")

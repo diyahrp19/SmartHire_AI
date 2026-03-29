@@ -1,5 +1,3 @@
-"""AI analysis module for SmartHire candidate evaluation."""
-
 import json
 import os
 import re
@@ -43,8 +41,6 @@ SKILL_NORMALIZATION_MAP = {
 
 @dataclass
 class CandidateAnalysis:
-    """Structured analysis output."""
-
     match_score: int
     matched_skills: List[str]
     missing_skills: List[str]
@@ -53,8 +49,6 @@ class CandidateAnalysis:
 
 
 class CandidateAnalyzer:
-    """Gemini-powered analyzer with heuristic fallback scoring."""
-
     def __init__(self, model: str = "gemini-1.5-flash", api_key: Optional[str] = None):
         self.model = model
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
@@ -276,7 +270,6 @@ Return JSON only:
         matched_set = {s.lower() for s in ai_matched}
         missing_set = {s.lower() for s in ai_missing}
 
-        # Keep matched/missing consistent with job requirements.
         for skill in required_skills:
             s = skill.lower()
             if s in matched_set and s in missing_set:
@@ -312,7 +305,6 @@ Return JSON only:
             )
             return result.__dict__
 
-        # Ensure candidate fields are present.
         safe_candidate = {
             "name": candidate_data.get("name") or "Unknown Candidate",
             "skills": candidate_data.get("skills") or [],
@@ -332,12 +324,9 @@ Return JSON only:
             final = self._coerce_analysis(ai_raw, baseline, required_skills)
             return final.__dict__
         except Exception:
-            # Fallback still returns realistic, structured evaluation.
             return baseline.__dict__
 
 
 def analyze_candidate(job_description: str, candidate_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Analyze one candidate using Gemini with resilient fallback behavior."""
-
     analyzer = CandidateAnalyzer()
     return analyzer.analyze_candidate(job_description, candidate_data)

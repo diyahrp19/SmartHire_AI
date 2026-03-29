@@ -1,10 +1,3 @@
-"""
-Enhanced Example Usage of the Resume Parser Module
-
-This script demonstrates the complete pipeline from PDF parsing to structured field extraction
-for a Resume Screening AI project.
-"""
-
 from resume_parser import extract_resume_text, clean_resume_text, validate_pdf_file, extract_resume_fields
 
 
@@ -14,11 +7,9 @@ def main():
     print("Enhanced Resume Parser Example Usage")
     print("=" * 40)
     
-    # Example 1: Complete pipeline demonstration
     print("\n1. Complete Pipeline Example:")
     print("-" * 30)
     
-    # Sample resume text (simulating what would come from extract_resume_text)
     sample_resume_content = """
     John Smith
     Senior Software Developer
@@ -50,15 +41,12 @@ def main():
     Graduated: June 2018
     """
     
-    # Step 1: Clean the resume text
     cleaned_text = clean_resume_text(sample_resume_content)
     print("✓ Step 1: Text cleaning completed")
     
-    # Step 2: Extract structured fields
     extracted_fields = extract_resume_fields(cleaned_text)
     print("✓ Step 2: Structured field extraction completed")
     
-    # Display the complete results
     print("\nComplete Extraction Results:")
     print("=" * 35)
     for key, value in extracted_fields.items():
@@ -67,7 +55,6 @@ def main():
         else:
             print(f"{key.title()}: {value if value else 'Not found'}")
     
-    # Example 2: Integration with AI analysis workflow
     print("\n2. AI Analysis Integration:")
     print("-" * 30)
     
@@ -78,23 +65,16 @@ def main():
     print("• Automated resume scoring")
     print("• Job description compatibility analysis")
     
-    # Example of how this would integrate with an AI model
     if extracted_fields.get("skills"):
         skills_string = ", ".join(extracted_fields["skills"])
         print(f"\nExample: Sending skills '{skills_string}' to AI matching algorithm...")
-        # In a real implementation:
-        # match_score = ai_model.match_skills(extracted_fields["skills"], job_requirements)
-        # print(f"Match Score: {match_score}")
     
-    # Example 3: Error handling demonstration
     print("\n3. Error Handling Examples:")
     print("-" * 28)
     
-    # Test with empty text
     empty_fields = extract_resume_fields("")
     print("Empty text handling:", empty_fields)
     
-    # Test with minimal text
     minimal_text = "Jane Doe\nEmail: jane@example.com"
     minimal_fields = extract_resume_fields(minimal_text)
     print("Minimal text extraction:", minimal_fields)
@@ -120,25 +100,20 @@ def process_complete_resume_pipeline(pdf_file_path: str):
     }
     
     try:
-        # Step 1: Validate the uploaded file
         if not validate_pdf_file(pdf_file_path):
             result['error'] = "Invalid PDF file or file not found"
             return result
         
-        # Step 2: Extract raw text from the PDF
         raw_text = extract_resume_text(pdf_file_path)
         
         if not raw_text:
             result['error'] = "Could not extract text from the resume"
             return result
         
-        # Step 3: Clean the extracted text
         cleaned_text = clean_resume_text(raw_text)
         
-        # Step 4: Extract structured fields
         structured_fields = extract_resume_fields(cleaned_text)
         
-        # Step 5: Calculate metadata
         word_count = len(cleaned_text.split()) if cleaned_text else 0
         char_count = len(cleaned_text) if cleaned_text else 0
         skill_count = len(structured_fields.get('skills', []))
@@ -170,7 +145,6 @@ def demonstrate_pipeline_integration():
     print("\n4. Pipeline Integration Example:")
     print("-" * 35)
     
-    # Simulate processing multiple resumes
     sample_resumes = [
         {
             'name': 'John Smith',
@@ -201,11 +175,9 @@ def demonstrate_pipeline_integration():
     candidates = []
     
     for resume_data in sample_resumes:
-        # Process each resume
         cleaned_text = clean_resume_text(resume_data['content'])
         fields = extract_resume_fields(cleaned_text)
         
-        # Create candidate profile
         candidate = {
             'name': fields.get('name', 'Unknown'),
             'email': fields.get('email'),
@@ -217,7 +189,6 @@ def demonstrate_pipeline_integration():
         
         candidates.append(candidate)
     
-    # Display processed candidates
     print("Processed Candidate Profiles:")
     print("-" * 32)
     for i, candidate in enumerate(candidates, 1):
@@ -227,7 +198,6 @@ def demonstrate_pipeline_integration():
         print(f"  Experience: {candidate['experience']}")
         print(f"  Education: {candidate['education']}")
     
-    # Example of AI-based filtering
     print(f"\nExample: Filtering candidates with Python skills...")
     python_candidates = [c for c in candidates if 'Python' in c['skills']]
     print(f"Found {len(python_candidates)} candidates with Python skills:")

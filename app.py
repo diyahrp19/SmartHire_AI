@@ -1,11 +1,3 @@
-"""
-SmartHire AI - Modern Resume Screening Platform
-Streamlit Web Application
-
-Professional AI-powered resume screening with modern UI, candidate ranking,
-skill analysis, and comprehensive data visualization.
-"""
-
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -15,8 +7,6 @@ import json
 import re
 import hashlib
 from typing import List, Dict, Any
-
-# ─── PDF text extraction (pure Python, no external binary) ───────────────────
 
 try:
     import pdfplumber
@@ -33,8 +23,6 @@ except ImportError:
     except ImportError:
         def extract_resume_text(path: str) -> str:
             return ""
-
-# ─── Simple resume field extraction ─────────────────────────────────────────
 
 def extract_resume_fields(text: str) -> Dict[str, Any]:
     """Extract basic fields from resume text."""
@@ -68,14 +56,11 @@ def extract_resume_fields(text: str) -> Dict[str, Any]:
     }
 
 
-# ─── AI-like candidate analysis (rule-based, no API needed) ─────────────────
-
 def analyze_candidate(job_desc: str, structured: Dict[str, Any]) -> Dict[str, Any]:
     """Analyze how well a candidate matches the job description."""
     job_lower = job_desc.lower()
     candidate_skills = structured.get("skills", [])
 
-    # Extract required skills from job description
     all_skills = [
         "Python", "JavaScript", "TypeScript", "React", "Angular", "Vue",
         "Node.js", "Django", "Flask", "FastAPI", "AWS", "Azure", "GCP",
@@ -98,7 +83,6 @@ def analyze_candidate(job_desc: str, structured: Dict[str, Any]) -> Dict[str, An
     else:
         score = 50
 
-    # Bonus for extra skills
     extra = [s for s in candidate_skills if s.lower() not in [r.lower() for r in required]]
     score = min(100, score + len(extra) * 2)
 
@@ -114,7 +98,6 @@ def analyze_candidate(job_desc: str, structured: Dict[str, Any]) -> Dict[str, An
     else:
         strengths.append("Candidate may be suitable for junior-track or trainable roles")
 
-    # Generate summary
     if score >= 80:
         summary = f"Excellent match with {len(matched)} key skills aligned. Strong candidate recommended for interview. Additional strengths in {', '.join(extra[:3]) if extra else 'relevant areas'}."
     elif score >= 60:
@@ -132,16 +115,12 @@ def analyze_candidate(job_desc: str, structured: Dict[str, Any]) -> Dict[str, An
     }
 
 
-# ─── Configure Streamlit ────────────────────────────────────────────────────
-
 st.set_page_config(
     page_title="SmartHire AI – Resume Screening Platform",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
-
-# ─── Modern CSS ──────────────────────────────────────────────────────────────
 
 st.markdown("""
 <style>
@@ -712,10 +691,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ─── Helpers ─────────────────────────────────────────────────────────────────
-
-
-
 def get_rank_badge(rank: int) -> str:
     badges = {1: "🥇", 2: "🥈", 3: "🥉"}
     return badges.get(rank, f"#{rank}")
@@ -727,6 +702,24 @@ def get_score_class(score: int) -> str:
     if score >= 80: return "score-high"
     if score >= 60: return "score-medium"
     return "score-low"
+
+
+def get_score_color_class(score: int) -> str:
+    """Backward-compatible score class mapping used by legacy tests."""
+    if score >= 80:
+        return "match-score-high"
+    if score >= 60:
+        return "match-score-medium"
+    return "match-score-low"
+
+
+def get_progress_class(score: int) -> str:
+    """Backward-compatible progress class mapping used by legacy tests."""
+    if score >= 80:
+        return "progress-high"
+    if score >= 60:
+        return "progress-medium"
+    return "progress-low"
 
 def get_score_color(score: int) -> str:
     if score >= 80: return "#1d4ed8"
@@ -763,8 +756,6 @@ PLOTLY_FULLSCREEN_ONLY_CONFIG = {
     "staticPlot": True,
 }
 
-
-# ─── Charts ──────────────────────────────────────────────────────────────────
 
 def create_score_chart(results):
     names = [r["structured_data"].get("name", f"C{i}").split()[0] for i, r in enumerate(results[:10])]
@@ -821,7 +812,6 @@ def create_skill_match_distribution(results):
         if not name:
             name = "Unknown"
 
-        # Keep axis labels neat and readable.
         name = name.title()
         name_parts = name.split()
         if len(name_parts) > 2:
@@ -838,11 +828,11 @@ def create_skill_match_distribution(results):
     colors = []
     for score in scores:
         if score >= 80:
-            colors.append("#16a34a")  # high
+            colors.append("#16a34a")
         elif score >= 60:
-            colors.append("#eab308")  # medium
+            colors.append("#eab308")
         else:
-            colors.append("#dc2626")  # low
+            colors.append("#dc2626")
 
     bar_width = 0.16 if len(display_names) <= 2 else 0.2
 
@@ -873,8 +863,6 @@ def create_skill_match_distribution(results):
     return fig
 
 
-# ─── Process Resume ──────────────────────────────────────────────────────────
-
 def process_resume(uploaded_file, job_desc: str) -> Dict[str, Any]:
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -902,7 +890,39 @@ def process_resume(uploaded_file, job_desc: str) -> Dict[str, Any]:
         return {"success": False, "error": str(e), "name": uploaded_file.name}
 
 
-# ─── Main App ────────────────────────────────────────────────────────────────
+def process_resume_file(uploaded_file, job_desc: str) -> Dict[str, Any]:
+    """Backward-compatible wrapper for older integration/tests."""
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(uploaded_file.getvalue())
+            tmp_path = tmp.name
+
+        raw_text = extract_resume_text(tmp_path)
+        if not raw_text:
+            os.unlink(tmp_path)
+            return {"success": False, "error": "Failed to extract text from PDF", "name": uploaded_file.name}
+
+        structured = extract_resume_fields(raw_text)
+        if not structured:
+            os.unlink(tmp_path)
+            return {"success": False, "error": "Failed to extract structured fields", "name": uploaded_file.name}
+
+        analysis = analyze_candidate(job_desc, structured)
+        os.unlink(tmp_path)
+
+        return {
+            "success": True,
+            "structured_data": structured,
+            "ai_analysis": analysis,
+            "name": uploaded_file.name,
+        }
+    except Exception as e:
+        try:
+            os.unlink(tmp_path)
+        except:
+            pass
+        return {"success": False, "error": str(e), "name": uploaded_file.name}
+
 
 def main():
     st.markdown("""
@@ -987,7 +1007,6 @@ def main():
 
         successful.sort(key=lambda x: x["ai_analysis"]["match_score"], reverse=True)
 
-        # ── Summary Metrics ──
         st.markdown('<p class="section-title">Summary</p>', unsafe_allow_html=True)
 
         m1, m2, m3, m4 = st.columns(4)
@@ -1011,7 +1030,6 @@ def main():
 
         st.markdown("---")
 
-        # ── Candidate Rankings ──
         st.markdown('<p class="section-title">Candidate Rankings</p>', unsafe_allow_html=True)
 
         for idx, r in enumerate(successful):
@@ -1031,14 +1049,12 @@ def main():
                 with c3:
                     st.markdown(f'<div class="rank-badge {get_rank_class(rank)}">{get_rank_badge(rank)}</div>', unsafe_allow_html=True)
 
-                # Progress bar
                 st.markdown(f'''
                 <div class="meter-track">
                     <div class="meter-fill" style="width: {score}%;"></div>
                 </div>
                 ''', unsafe_allow_html=True)
 
-                # Skills
                 st.markdown("**Matched Skills:**")
                 if analysis["matched_skills"]:
                     skills_html = " ".join([f'<span class="skill-badge skill-matched">{s}</span>' for s in analysis["matched_skills"]])
@@ -1063,7 +1079,6 @@ def main():
                     strengths_html = "".join([f'<li class="strength-item">{s}</li>' for s in analysis["strengths"]])
                     st.markdown(f'<ul class="strength-list">{strengths_html}</ul>', unsafe_allow_html=True)
 
-                # AI Summary
                 st.markdown(f'''
                 <div class="summary-box">
                     <div class="summary-title">🤖 AI Summary</div>
@@ -1073,7 +1088,6 @@ def main():
 
         st.markdown("---")
 
-        # ── Data Visualization ──
         st.markdown('<p class="section-title">Data Visualization</p>', unsafe_allow_html=True)
         left_col, center_col, right_col = st.columns([1, 2, 1])
         with center_col:

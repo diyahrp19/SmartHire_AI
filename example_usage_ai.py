@@ -1,12 +1,7 @@
-"""
-Clean example usage: Resume parsing + AI analysis with exact output format.
-"""
-
 from resume_parser import extract_resume_fields, clean_resume_text
 from ai_analysis import analyze_candidate
 
 def main():
-    # Sample resume text (replace with extract_resume_text(pdf_path) for real PDF)
     sample_resume = """
 Alice Johnson
 Senior Full Stack Developer
@@ -30,7 +25,6 @@ EDUCATION
 B.Tech Computer Science, IIT Bombay, 2019
 """
 
-    # Job description
     job_desc = """
 Senior Full Stack Developer needed.
 
@@ -41,14 +35,11 @@ Requirements:
 - 3+ years experience
 """
 
-    # Parse resume
     cleaned = clean_resume_text(sample_resume)
     candidate_data = extract_resume_fields(cleaned)
 
-    # Analyze
     analysis = analyze_candidate(job_desc, candidate_data)
 
-    # Print exact format
     print(f"Candidate: {candidate_data.get('name', 'Unknown')}")
     print(f"Match Score: {analysis['match_score']}/100")
     print()
@@ -71,4 +62,5 @@ Requirements:
 
 if __name__ == "__main__":
     main()
+
 
