@@ -4,7 +4,7 @@ SmartHire AI analyzes PDF resumes, extracts candidate details, and scores job-fi
 
 ## Live Demo
 
-https://smarthire-ai-1qr9.onrender.com
+https://smarthireaigit-jdkyeumckzsgggiifngfa3.streamlit.app/
 
 ## Features
 
